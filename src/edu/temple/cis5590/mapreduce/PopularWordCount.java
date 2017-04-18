@@ -20,6 +20,7 @@ import java.util.StringTokenizer;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
+import org.apache.hadoop.mapreduce.Reducer;
 
 /**
  * 
@@ -52,10 +53,42 @@ public class PopularWordCount {
 				// force word to lowercase to cancel any capitalization discrepancies
 				String token = itr.nextToken().toLowerCase();
 				if (token.length() >= 5) {
+					// increment token word count
 					word.set(CountryManager.getCountryToken(context, token));
+					context.write(word, one);
+					
+					// increment total word count
+					word.set(CountryManager.getCountryToken(context));
 					context.write(word, one);
 				}
 			}
+		}
+	}
+
+	// ============================================================================================
+	//										REDUCE
+	// ============================================================================================
+	
+	/**
+	 * 
+	 */
+	public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+		private IntWritable result = new IntWritable();
+		
+		/**
+		 * 
+		 * @param key
+		 * @param values
+		 * @param context
+		 * @throws IOException
+		 * @throws InterruptedException
+		 */
+		public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+						  throws IOException, InterruptedException {
+			int sum = 0;
+			for (IntWritable val : values) sum += val.get(); 
+			result.set(sum);
+			context.write(CountryManager.getTextForMapKey(key), result);
 		}
 	}
   

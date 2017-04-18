@@ -30,6 +30,18 @@ public class CountryManager {
 	 * @return
 	 */
 	@SuppressWarnings("rawtypes")
+	public static Text getCountryText(Context context) {
+		String filename = ((FileSplit)context.getInputSplit()).getPath().getName();
+		filename = filename.substring(0, filename.indexOf("."));	// strip extension
+		return (new Text(filename));
+	}
+	
+	/**
+	 * 
+	 * @param context
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
 	public static String getCountryToken(Context context) {
 		String filename = ((FileSplit)context.getInputSplit()).getPath().getName();
 		filename = filename.substring(0, filename.indexOf("."));	// strip extension
@@ -76,10 +88,10 @@ public class CountryManager {
 	 * @param key
 	 * @return
 	 */
-	public static int getPartitionForMapKey(Text key) {
+	public static int getPartitionForMapKey(CountryTokenKey key) {
 		// keys should be coming in using format [file name][dash][target word]
-		String[] str = key.toString().split("-");
-		return getPartitionForCountryName(str[0]);
+		String countryName = key.getCountry().toString();
+		return getPartitionForCountryName(countryName);
 	}
 	
 	/**
