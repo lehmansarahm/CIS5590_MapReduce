@@ -7,23 +7,28 @@
 //	Email:		smlehman@temple.edu
 //
 //	Program:	Semester Project, AWS Hadoop Map-Reduce
-//  Source:		https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
+//  Sources:	https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
+//				https://www.tutorialspoint.com/map_reduce/map_reduce_partitioner.htm
 //
 // =======================================================================
 
 package edu.temple.cis5590.mapreduce;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.StringTokenizer;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
-import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
+/**
+ * 
+ */
 public class BaseWordCount {
+
+	// ============================================================================================
+	//										MAP
+	// ============================================================================================
 	
 	/**
 	 * 
@@ -64,68 +69,27 @@ public class BaseWordCount {
 				// To address this, search the token for each target word, instead 
 				// of the array of target words for each token
 				for (int i = 0; i < targetWords.length; i++) {
-					// filter out the plurals ... keep everything else
-					if (token.contains(targetWords[i]) && !token.equals(targetWords[i] + "s")) {
-						word.set(getCountryToken(context, targetWords[i]));
+					if (token.contains(targetWords[i])) {
+						word.set(CountryManager.getCountryToken(context, targetWords[i]));
 						context.write(word, one);
 						break;
 					}
 				}
-				
-				/*if (Arrays.asList(targetWords).contains(token)) {
-					word.set(getCountryToken(context, token));
-					context.write(word, one);
-				}*/
 			}
 		}
 		
 		/**
 		 * 
-		 * @param context
-		 */
-		private void initializeTokens(Context context)
-									  throws IOException, InterruptedException {
-			for (int i = 0; i < targetWords.length; i++) {
-				word.set(getCountryToken(context, targetWords[i]));
-				context.write(word, zero);
-			}
-		}
-		
-		/**
-		 * 
-		 * @param context
-		 * @param token
-		 * @return
-		 */
-		private String getCountryToken(Context context, String token) {
-			String filename = ((FileSplit)context.getInputSplit()).getPath().getName();
-			String countryName = filename.substring(0, filename.indexOf("."));
-			return (countryName + " - " + token);
-		}
-	}
-	
-	/**
-	 * 
-	 */
-	public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-		private IntWritable result = new IntWritable();
-		
-		/**
-		 * 
-		 * @param key
-		 * @param values
 		 * @param context
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) 
-						  throws IOException, InterruptedException {
-			int sum = 0;
-			for (IntWritable val : values) {
-				sum += val.get();
+		private void initializeTokens(Context context)
+									  throws IOException, InterruptedException {
+			for (int i = 0; i < targetWords.length; i++) {
+				word.set(CountryManager.getCountryToken(context, targetWords[i]));
+				context.write(word, zero);
 			}
-			result.set(sum);
-			context.write(key, result);
 		}
 	}
   
