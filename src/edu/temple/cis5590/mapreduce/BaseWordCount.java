@@ -70,8 +70,15 @@ public class BaseWordCount {
 				// of the array of target words for each token
 				for (int i = 0; i < targetWords.length; i++) {
 					if (token.contains(targetWords[i])) {
+						// increment target word count
 						word.set(CountryManager.getCountryToken(context, targetWords[i]));
 						context.write(word, one);
+						
+						// increment total word count
+						word.set(CountryManager.getCountryToken(context));
+						context.write(word, one);
+						
+						// exit loop
 						break;
 					}
 				}

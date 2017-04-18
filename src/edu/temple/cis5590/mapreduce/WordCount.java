@@ -14,12 +14,15 @@
 
 package edu.temple.cis5590.mapreduce;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
+import org.apache.hadoop.io.IntWritable.Comparator;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Partitioner;
@@ -71,17 +74,23 @@ public class WordCount {
     		break;
 	    }
 	    
-	    // set common properties
+	    // set common partition properties
 	    job.setPartitionerClass(CountryPartitioner.class);
 	    job.setNumReduceTasks(CountryManager.COUNTRIES.length);
+	    
+	    // set common reduce properties
 	    job.setCombinerClass(IntSumReducer.class);
 	    job.setReducerClass(IntSumReducer.class);
+	    job.setSortComparatorClass(ResultSorter.class);
+	    
+	    // set common output properties
 	    job.setOutputKeyClass(Text.class);
 	    job.setOutputValueClass(IntWritable.class);
 
 	    // finish the job ... if completes successfully, dump log to file
 	    if (job.waitForCompletion(true)) {
 	    	Logger.writeResultsToLog();
+	    	printResultsToTerminal(outputPath);
 	    	System.exit(0);
 	    } else System.exit(1);
 	  }
@@ -100,6 +109,47 @@ public class WordCount {
 			}
 			if (!retainOrigDir) folder.delete();
 		} else if (retainOrigDir) folder.mkdir();
+	}
+	
+	/**
+	 * 
+	 */
+	private static void printResultsToTerminal(String outputPath) {
+		System.out.println("\n===========================================================================");
+		System.out.println("\tJob Complete! Check log for detailed execution output.");
+		System.out.println("===========================================================================");
+		//System.out.println("\nFinal Partition Outputs Go Here\n");
+
+		File outputFolder = new File(outputPath);
+		if (outputFolder.exists() && outputFolder.isDirectory()) {
+			String[] files = outputFolder.list();
+			for (String filename: files) {
+				if (filename.contains("part")) {	// make sure we're grabbing the partition output files
+					File currentFile = new File(outputFolder.getPath(), filename);
+		            try {
+		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
+		                boolean contentWritten = false;
+		                
+		                String line;
+		                while ((line = br.readLine()) != null) {
+		                	// filter out unicode fluff
+		                	if (!line.startsWith("crc")) {
+			                    System.out.println(line);
+			                    contentWritten = true;
+		                	}
+		                }
+		                
+		                if (contentWritten) {
+		                	System.out.println("===========================================================================");
+		                }
+		                br.close();
+		            } catch (IOException e) {
+		                Logger.info("Could not read file: " + e.toString());
+		                Logger.error("File read failed: " + e.toString());
+		            }
+				}
+			}
+		}
 	}
 
 	// ============================================================================================
@@ -150,6 +200,39 @@ public class WordCount {
 			result.set(sum);
 			context.write(CountryManager.getTextForMapKey(key), result);
 		}
+	}
+
+	// ============================================================================================
+	//										SORT
+	// ============================================================================================
+	
+	/**
+	 * 
+	 */
+	public static class ResultSorter extends Comparator {
+		
+		/**
+		 * 
+		 * @param iw1
+		 * @param iw2
+		 * @return
+		 */
+		public int compare(IntWritable iw1, IntWritable iw2) {
+			// return negative integer, zero, or a positive integer if the first argument 
+			// is less than, equal to, or greater than the second
+			return (iw1.get() - iw2.get());
+		}
+		
+		/**
+		 * 
+		 * @param c
+		 * @return
+		 */
+		public boolean equals(Comparator c) {
+			// don't care about this ... short circuit to "false"
+			return false;
+		}
+		
 	}
 	  
 }

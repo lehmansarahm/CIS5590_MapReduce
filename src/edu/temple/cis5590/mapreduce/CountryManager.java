@@ -27,6 +27,21 @@ public class CountryManager {
 	/**
 	 * 
 	 * @param context
+	 * @return
+	 */
+	@SuppressWarnings("rawtypes")
+	public static String getCountryToken(Context context) {
+		String filename = ((FileSplit)context.getInputSplit()).getPath().getName();
+		filename = filename.substring(0, filename.indexOf("."));	// strip extension
+
+		// Log processing of new country token
+		Logger.info("New token found: " + filename);
+		return filename;
+	}
+	
+	/**
+	 * 
+	 * @param context
 	 * @param token
 	 * @return
 	 */
