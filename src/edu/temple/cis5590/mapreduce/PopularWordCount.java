@@ -1,17 +1,25 @@
+// =======================================================================
+//
+//	Course:		CIS 5590, Spring 2017
+//	Professor:	X. He
+//	
+//	Author:		Sarah M. Lehman
+//	Email:		smlehman@temple.edu
+//
+//	Program:	Semester Project, AWS Hadoop Map-Reduce
+//  Source:		https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
+//
+// =======================================================================
+
 package edu.temple.cis5590.mapreduce;
 
 import java.io.IOException;
 import java.util.StringTokenizer;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class PopularWordCount {
 
@@ -44,20 +52,6 @@ public class PopularWordCount {
       result.set(sum);
       context.write(key, result);
     }
-  }
-
-  public static void main(String[] args) throws Exception {
-    Configuration conf = new Configuration();
-    Job job = Job.getInstance(conf, "word count");
-    job.setJarByClass(PopularWordCount.class);
-    job.setMapperClass(TokenizerMapper.class);
-    job.setCombinerClass(IntSumReducer.class);
-    job.setReducerClass(IntSumReducer.class);
-    job.setOutputKeyClass(Text.class);
-    job.setOutputValueClass(IntWritable.class);
-    FileInputFormat.addInputPath(job, new Path(args[0]));
-    FileOutputFormat.setOutputPath(job, new Path(args[1]));
-    System.exit(job.waitForCompletion(true) ? 0 : 1);
   }
   
 }
