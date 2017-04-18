@@ -58,10 +58,24 @@ public class BaseWordCount {
 			while (itr.hasMoreTokens()) {
 				// force word to lowercase to cancel any capitalization discrepancies
 				String token = itr.nextToken().toLowerCase();
-				if (Arrays.asList(targetWords).contains(token)) {
+				
+				// it's possible that the tokenizer won't parse out the target words 
+				// completely (lingering punctuation, squished-together words, etc.)  
+				// To address this, search the token for each target word, instead 
+				// of the array of target words for each token
+				for (int i = 0; i < targetWords.length; i++) {
+					// filter out the plurals ... keep everything else
+					if (token.contains(targetWords[i]) && !token.equals(targetWords[i] + "s")) {
+						word.set(getCountryToken(context, targetWords[i]));
+						context.write(word, one);
+						break;
+					}
+				}
+				
+				/*if (Arrays.asList(targetWords).contains(token)) {
 					word.set(getCountryToken(context, token));
 					context.write(word, one);
-				}
+				}*/
 			}
 		}
 		
