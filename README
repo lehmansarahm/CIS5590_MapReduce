@@ -1,0 +1,51 @@
+=======================================================================
+
+	Course:		CIS 5590, Spring 2017
+	Professor:	X. He
+
+	Author:		Sarah M. Lehman
+	Email:		smlehman@temple.edu
+
+	Program:	Semester Project, AWS Hadoop Map-Reduce
+	Source:		https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
+
+=======================================================================
+
+BUILDING THE CODE BASE
+-----------------------------
+	- This code base can be bundled into a JAR file using the "build.xml" file at the project root.
+	- If the developer is using Eclipse, the file may be right-clicked and run as an Ant build file.
+	- If the developer wishes, the file may also be run using Ant from the command line.
+	- The resulting JAR and MANIFEST files will be written to the "bin/jar" directory until the project root.
+	
+RUNNING THE PROGRAM
+-----------------------------
+	- The program requires an active installation of Java and Hadoop on the target machine in order to run.
+	- The program may be run from the command line with the following instruction:
+		> [Hadoop install dir] jar CIS5590_MapReduce_Lehman.jar [optional: [processing type] [input dir] [output dir]]
+		Example:
+		> /usr/local/hadoop/bin/hadoop jar CIS5590_MapReduce_Lehman.jar
+	- If no arguments are provided for processing type, input directory, or output directory, the following default values will be used:
+		- processing type:  basic (searching for words "economy", "education", "government", "sports")
+			- other options:  popular (searching for most popular words over five letters long for each country)
+		- input directory:  ./input (folder of text files in current execution directory)
+		- output directory:  ./output (will be overwritten if already exists)
+	- NOTE THAT EXECUTION PARAMETERS MUST BE INCLUDED IN DESIGNATED ORDER
+		- All three arguments may be omitted, but if a given argument is included, all preceding arguments must also be included
+		- i.e. processing type may be included without any other arguments, but output directory may not be included without also including processing type and input directory
+
+VERIFIED ENVIRONMENTS
+-----------------------------
+	- This program was verified on a system with the following specifications:
+		- Ubuntu v. 16.04 operating system
+		- Java v. 1.8.0_121
+		- Hadoop v. 2.8.0
+	- This program was tested locally using a virtual machine with the following specifications:
+		- VirtualBox v. 5.1.14 with allocations:
+			- 4GB RAM
+			- 2 CPU cores
+		- 2015 Macbook Pro, running OSX 12 (Sierra) with:
+			- 8GB RAM
+			- 2.7 GHz Intel i5 CPU
+	- This program was tested remotely using AWS EC2 instances with the following specifications:
+		- Etc.

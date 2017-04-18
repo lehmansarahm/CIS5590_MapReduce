@@ -58,6 +58,7 @@ public class WordCount {
 	    	outputFolder.delete();
 	    }
 	    
+	    // set the necessary classes by processing type
 	    switch (processingType.toLowerCase()) {
 	    case "popular":
 		    job.setJarByClass(PopularWordCount.class);
@@ -73,6 +74,7 @@ public class WordCount {
     		break;
 	    }
 	    
+	    // finish the job
 	    job.setOutputKeyClass(Text.class);
 	    job.setOutputValueClass(IntWritable.class);
 	    System.exit(job.waitForCompletion(true) ? 0 : 1);
