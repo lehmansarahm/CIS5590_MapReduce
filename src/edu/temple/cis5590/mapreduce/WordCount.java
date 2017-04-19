@@ -48,12 +48,14 @@ public class WordCount {
 	    String processingType = (args.length >= 1) ? args[0] : DEFAULT_PROCESSING_TYPE;
 	    String inputPath = (args.length >= 2) ? args[1] : DEFAULT_INPUT_PATH;
 	    String intermPath = DEFAULT_INTERMEDIATE_PATH;
+	    String interm2Path = intermPath + "2";
 	    String outputPath = (args.length >= 3) ? args[2] : DEFAULT_OUTPUT_PATH;
 	    String logsPath = (args.length >= 4) ? args[3] : Logger.DEFAULT_LOGS_PATH;
 	    
 	    // if intermediate, output, and log folders already exist, delete 
 	    // them and all of their contents so we can do a fresh write
 	    resetDirectory(intermPath, false);
+	    resetDirectory(interm2Path, false);
 	    resetDirectory(outputPath, false);
 	    resetDirectory(logsPath, true);
 		    
@@ -63,12 +65,14 @@ public class WordCount {
 	    FileOutputFormat.setOutputPath(wordCountJob, new Path(intermPath));
 	    
 	    // set the processing type specific classes
+	    boolean limitTopResults = false;
 	    switch (processingType.toLowerCase()) {
 	    case "popular":
 		    wordCountJob.setJarByClass(PopularWordCount.class);
 		    wordCountJob.setMapperClass(PopularWordCount.TokenizerMapper.class);
 		    wordCountJob.setCombinerClass(IntSumReducer.class);
 		    wordCountJob.setReducerClass(IntSumReducer.class);
+		    limitTopResults = true;
 	    	break;
     	default:
     	    wordCountJob.setJarByClass(BaseWordCount.class);
@@ -88,7 +92,13 @@ public class WordCount {
 	    	// word count finished successfully ... run the sorting job
 		    Job sortJob = Job.getInstance(conf, "wordCountSort");
 		    FileInputFormat.addInputPath(sortJob, new Path(intermPath));
-		    FileOutputFormat.setOutputPath(sortJob, new Path(outputPath));
+		    
+		    // depending on whether we are limiting the final 
+		    // results, change the output path
+		    if (limitTopResults)
+		    	FileOutputFormat.setOutputPath(sortJob, new Path(interm2Path));
+		    else
+		    	FileOutputFormat.setOutputPath(sortJob, new Path(outputPath));
 
 		    // set map-reduce properties
 		    sortJob.setJarByClass(CountrySort.class);
@@ -109,6 +119,32 @@ public class WordCount {
 		    
 		    // run the job!
 		    code = sortJob.waitForCompletion(true) ? 0 : 1;
+		    if (code == 0 && limitTopResults) {
+		    	// if evaluating overall popular words, run the result limiter job
+			    Job limitJob = Job.getInstance(conf, "wordCountLimit");
+			    FileInputFormat.addInputPath(limitJob, new Path(interm2Path));
+			    FileOutputFormat.setOutputPath(limitJob, new Path(outputPath));
+
+			    // set map-reduce properties
+			    limitJob.setJarByClass(TopResultLimit.class);
+			    limitJob.setMapperClass(TopResultLimit.TopResultTokenMapper.class);
+			    limitJob.setReducerClass(CountrySort.CountryCountReducer.class);
+			    
+			    // set processing properties
+			    limitJob.setPartitionerClass(CountrySort.CountryPartitioner.class);
+			    limitJob.setNumReduceTasks(CountryManager.COUNTRIES.length);
+			    limitJob.setGroupingComparatorClass(CountrySort.CountryTokenGroupComparator.class);
+			    limitJob.setSortComparatorClass(CountrySort.CountryTokenSortComparator.class);
+			    
+			    // set output properties
+			    limitJob.setMapOutputKeyClass(CountryTokenKey.class);
+			    limitJob.setMapOutputValueClass(IntWritable.class);
+			    limitJob.setOutputKeyClass(CountryTokenKey.class);
+			    limitJob.setOutputValueClass(IntWritable.class);
+			    
+			    // run the job!
+			    code = limitJob.waitForCompletion(true) ? 0 : 1;
+		    }
 	    }
 	    
 	    // print results and finish up
