@@ -90,12 +90,14 @@ public class CountryTokenKey implements WritableComparable<CountryTokenKey> { //
 	public void readFields(DataInput in) throws IOException {
 		this.country.readFields(in);
 		this.token.readFields(in);
+		this.count.readFields(in);
 	}
 
 	@Override
 	public void write(DataOutput out) throws IOException {
 		this.country.write(out);
 		this.token.write(out);
+		this.count.write(out);;
 	}
 	
 	@Override
