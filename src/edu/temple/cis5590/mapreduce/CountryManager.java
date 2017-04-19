@@ -65,8 +65,7 @@ public class CountryManager {
 		String countryName = key.getCountry().toString();
 		int partition = getPartitionForCountryName(countryName);
 
-		Logger.info("Partition phase,Country: " + countryName 
-				+ " with token: " + key.getToken()
+		Logger.info("Partition phase,CountryTokenKey: " + key.toLongString()
 				+ " assigned to partition: " + partition);
 		return partition;
 	}
