@@ -4,25 +4,34 @@ import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.IOException;
 
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.io.WritableComparable;
 
 public class CountryTokenKey implements WritableComparable<CountryTokenKey> { // Writable, WritableComparable<CountryTokenKey>  {
-	
-	private Text country;	// natural key
+
+	public final static String TOTAL_TOKEN = "total";
+	private Text country;		// natural key
 	private Text token;
-	private int count;		// secondary key
+	private IntWritable count;	// secondary key
 	
 	public CountryTokenKey() {
 		this.country = new Text();
 		this.token = new Text();
-		this.count = 0;
+		this.count = new IntWritable();
 	}
 	
 	public void setProps (String country, String token, int count) {
+		for (int i = 0; i < CountryManager.COUNTRIES.length; i++) {
+			String countryName = CountryManager.COUNTRIES[i].toLowerCase().replace(" ", "");
+			if (country.toLowerCase().contains(countryName)) {
+				country = CountryManager.COUNTRIES[i];
+				break;
+			}
+		}
 		this.country.set(country);
 		this.token.set(token);
-		this.count = count;
+		this.count.set(count);
 	}
 	
 	public Text getCountry() {
@@ -33,20 +42,48 @@ public class CountryTokenKey implements WritableComparable<CountryTokenKey> { //
 		return this.token;
 	}
 	
-	public int getCount() {
+	public IntWritable getCount() {
 		return this.count;
+	}
+
+	public int groupBy(CountryTokenKey ctk) {
+		// if this key is a country total, it should always come first
+		if (token.toString().contains(country.toString())) return -1;
+		else {
+			// apply the actual comparison
+			int comparison = this.country.compareTo(ctk.getCountry());
+			if (comparison == 0) {
+				comparison = this.token.compareTo(ctk.getToken());
+			}
+			return comparison;
+		}
+	}
+	
+	public int sortBy(CountryTokenKey ctk) {
+    	int comparison = country.compareTo(ctk.getCountry());
+    	if (comparison == 0) {
+    		// if partitioning worked correctly, country 
+    		// comparison should always be zero
+    		comparison = count.compareTo(ctk.getCount());
+    	}
+    	return comparison;
 	}
 
 	@Override
 	public int compareTo(CountryTokenKey ctk) {
-		int comparison = this.country.compareTo(ctk.getCountry());
-		if (comparison == 0) {
-			comparison = this.token.compareTo(ctk.getToken());
+		// if this key has the same token and country, it should always come first
+		if (country.toString().equals(token.toString())) return -1;
+		else {
+			// apply the actual comparison
+			int comparison = count.compareTo(ctk.getCount());
+			if (comparison == 0) {
+				comparison = this.token.compareTo(ctk.getToken());
+			}
+			if (comparison == 0) {
+				comparison = this.country.compareTo(ctk.getCountry());
+			}
+			return comparison;
 		}
-		if (comparison == 0) {
-			comparison = (this.count - ctk.getCount());
-		}
-		return comparison;
 	}
 
 	@Override
@@ -63,11 +100,13 @@ public class CountryTokenKey implements WritableComparable<CountryTokenKey> { //
 	
 	@Override
 	public String toString() {
-		return this.token.toString();
+		if (this.token.toString().equals(TOTAL_TOKEN))
+			return this.country + " (" + TOTAL_TOKEN + ")";
+		else return this.token.toString();
 	}
 	
 	public String toLongString() {
-		return (this.country + "-" + this.token);
+		return (this.country + "-" + this.token + "-" + this.count);
 	}
 	
 }

@@ -49,16 +49,15 @@ public class CountrySort {
 					   throws IOException, InterruptedException {
 			String[] lineValues = value.toString().split("\t");
 			String[] keyValues = lineValues[0].split("-");
+			CountryTokenKey ctk = new CountryTokenKey();
 			
 			String countryName = keyValues[0];
 			String token = (keyValues.length >= 2) ? keyValues[1] : keyValues[0];
 			int count = (lineValues.length >= 2) ? Integer.parseInt(lineValues[1]) : 0;
-			Logger.debug("Parsing intermediate value for country: " + countryName 
-					+ ", token: " + token + ", count: " + count);
-			
-			CountryTokenKey ctk = new CountryTokenKey();
 			ctk.setProps(countryName, token, count);
-			context.write(ctk, new IntWritable(count));
+			
+			Logger.info("Map phase,Parsing intermediate values for:" + ctk.toLongString());
+			context.write(ctk, ctk.getCount());
 		}
 	}
 
@@ -86,6 +85,35 @@ public class CountrySort {
 	}
 
 	// ============================================================================================
+	//										SORT
+	// ============================================================================================
+	
+	/**
+	 * 
+	 */
+	public static class CountryTokenSortComparator extends WritableComparator {
+		/**
+		 * 
+		 */
+	    public CountryTokenSortComparator() {
+	        super(CountryTokenKey.class, true);
+	    }
+
+		/**
+		 * 
+		 * @param w1
+		 * @param w2
+		 */
+	    @SuppressWarnings("rawtypes")
+	    public int compare(WritableComparable w1, WritableComparable w2) {
+	    	CountryTokenKey key1 = (CountryTokenKey) w1;
+	    	CountryTokenKey key2 = (CountryTokenKey) w2;
+	    	Logger.info("Sort phase,Sorting values: " + key1.toLongString() + " and " + key2.toLongString());
+	    	return -1 * (key1.sortBy(key2));// sort first by country, then by word count (DESCENDING)
+	    }
+	}
+
+	// ============================================================================================
 	//										GROUP
 	// ============================================================================================
 	
@@ -109,8 +137,8 @@ public class CountrySort {
 	    public int compare(WritableComparable w1, WritableComparable w2) {
 	    	CountryTokenKey key1 = (CountryTokenKey) w1;
 	    	CountryTokenKey key2 = (CountryTokenKey) w2;
-	    	Logger.info("Comparing values: " + key1.toLongString() + " and " + key2.toLongString());
-	    	return (key1.compareTo(key2));	// key distinct by country, token, count
+	    	Logger.info("Group phase,Grouping values: " + key1.toLongString() + " and " + key2.toLongString());
+	    	return (key1.groupBy(key2));	// group by country and token names
 	    }
 	}
 
@@ -138,38 +166,9 @@ public class CountrySort {
 			for (IntWritable val : values) sum += val.get(); 
 			result.set(sum);
 			
-			Logger.debug("Total values found,Key: " + key + ",Count: " + sum);
+			Logger.debug("Reduce phase,Total values found,Key: " + key + ",Count: " + sum);
 			context.write(key, result);
 		}
-	}
-
-	// ============================================================================================
-	//										SORT
-	// ============================================================================================
-	
-	/**
-	 * 
-	 */
-	public static class CountryTokenSortComparator extends WritableComparator {
-		/**
-		 * 
-		 */
-	    public CountryTokenSortComparator() {
-	        super(CountryTokenKey.class, true);
-	    }
-
-		/**
-		 * 
-		 * @param w1
-		 * @param w2
-		 */
-	    @SuppressWarnings("rawtypes")
-	    public int compare(WritableComparable w1, WritableComparable w2) {
-	    	CountryTokenKey key1 = (CountryTokenKey) w1;
-	    	CountryTokenKey key2 = (CountryTokenKey) w2;
-	    	Logger.info("Sorting values: " + key1.toLongString() + " and " + key2.toLongString());
-	    	return -1 * (key1.getCount() - key2.getCount());
-	    }
 	}
   
 }

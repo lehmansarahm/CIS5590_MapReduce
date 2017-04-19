@@ -102,6 +102,8 @@ public class WordCount {
 		    sortJob.setSortComparatorClass(CountrySort.CountryTokenSortComparator.class);
 		    
 		    // set output properties
+		    sortJob.setMapOutputKeyClass(CountryTokenKey.class);
+		    sortJob.setMapOutputValueClass(IntWritable.class);
 		    sortJob.setOutputKeyClass(CountryTokenKey.class);
 		    sortJob.setOutputValueClass(IntWritable.class);
 		    

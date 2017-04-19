@@ -57,7 +57,7 @@ public class PopularWordCount {
 					context.write(word, one);
 					
 					// increment total word count
-					word.set(CountryManager.getCountryToken(context));
+					word.set(CountryManager.getCountryName(context));
 					context.write(word, one);
 				}
 			}

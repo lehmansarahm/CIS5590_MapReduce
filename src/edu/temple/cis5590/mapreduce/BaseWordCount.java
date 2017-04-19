@@ -34,10 +34,11 @@ public class BaseWordCount {
 	 * 
 	 */
 	public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable>{
-		private final static String[] targetWords = 
+		private final static String[] TARGET_WORDS = 
 				new String[] { "economy", "education", "government", "sports" };
-		private final static IntWritable zero = new IntWritable(0);
-		private final static IntWritable one = new IntWritable(1);
+		
+		private final static IntWritable ZERO = new IntWritable(0);
+		private final static IntWritable ONE = new IntWritable(1);
 		
 		private Text word = new Text();
 		private boolean init = false;
@@ -68,15 +69,15 @@ public class BaseWordCount {
 				// completely (lingering punctuation, squished-together words, etc.)  
 				// To address this, search the token for each target word, instead 
 				// of the array of target words for each token
-				for (int i = 0; i < targetWords.length; i++) {
-					if (token.contains(targetWords[i])) {
+				for (int i = 0; i < TARGET_WORDS.length; i++) {
+					if (token.contains(TARGET_WORDS[i])) {
 						// increment target word count
-						word.set(CountryManager.getCountryToken(context, targetWords[i]));
-						context.write(word, one);
+						word.set(CountryManager.getCountryToken(context, TARGET_WORDS[i]));
+						context.write(word, ONE);
 						
 						// increment total word count
-						word.set(CountryManager.getCountryToken(context));
-						context.write(word, one);
+						word.set(CountryManager.getCountryToken(context, CountryTokenKey.TOTAL_TOKEN));
+						context.write(word, ONE);
 						
 						// exit loop
 						break;
@@ -93,9 +94,9 @@ public class BaseWordCount {
 		 */
 		private void initializeTokens(Context context)
 									  throws IOException, InterruptedException {
-			for (int i = 0; i < targetWords.length; i++) {
-				word.set(CountryManager.getCountryToken(context, targetWords[i]));
-				context.write(word, zero);
+			for (int i = 0; i < TARGET_WORDS.length; i++) {
+				word.set(CountryManager.getCountryToken(context, TARGET_WORDS[i]));
+				context.write(word, ZERO);
 			}
 		}
 	}
