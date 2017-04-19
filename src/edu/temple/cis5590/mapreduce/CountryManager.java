@@ -47,7 +47,7 @@ public class CountryManager {
 		filename = filename.substring(0, filename.indexOf("."));	// strip extension
 
 		// Log processing of new country token
-		Logger.info("New token found: " + filename);
+		// Logger.info("New token found: " + filename);
 		return filename;
 	}
 	
@@ -64,7 +64,7 @@ public class CountryManager {
 		String newToken = (filename + "-" + token);
 
 		// Log processing of new country token
-		Logger.info("New token found: " + newToken);
+		// Logger.info("New token found: " + newToken);
 		return newToken;
 	}
 	
@@ -79,7 +79,7 @@ public class CountryManager {
 		Text textVal = (new Text((str.length >= 2) ? str[1] : str[0]));
 		
 		// Log processing of new text value
-		Logger.info("MapReduce value returned: " + textVal.toString());
+		// Logger.info("MapReduce value returned: " + textVal.toString());
 		return textVal;
 	}
 	
@@ -91,7 +91,12 @@ public class CountryManager {
 	public static int getPartitionForMapKey(CountryTokenKey key) {
 		// keys should be coming in using format [file name][dash][target word]
 		String countryName = key.getCountry().toString();
-		return getPartitionForCountryName(countryName);
+		int partition = getPartitionForCountryName(countryName);
+
+		Logger.info("Country: " + countryName 
+				+ " with token: " + key.getToken()
+				+ " assigned to partition: " + partition);
+		return partition;
 	}
 	
 	/**
@@ -102,8 +107,6 @@ public class CountryManager {
 	public static int getPartitionForCountryName(String countryName) {
 		for (int i = 0; i < COUNTRIES.length; i++) {
 			if (COUNTRIES[i].equalsIgnoreCase(countryName)) {
-				// Match found ... add to log
-				Logger.info("Country: " + countryName + " assigned to partition: " + i);
 				return i;
 			}
 		}

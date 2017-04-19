@@ -24,6 +24,7 @@ import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
@@ -66,14 +67,14 @@ public class WordCount {
 	    case "popular":
 		    wordCountJob.setJarByClass(PopularWordCount.class);
 		    wordCountJob.setMapperClass(PopularWordCount.TokenizerMapper.class);
-		    wordCountJob.setCombinerClass(PopularWordCount.IntSumReducer.class);
-		    wordCountJob.setReducerClass(PopularWordCount.IntSumReducer.class);
+		    wordCountJob.setCombinerClass(IntSumReducer.class);
+		    wordCountJob.setReducerClass(IntSumReducer.class);
 	    	break;
     	default:
     	    wordCountJob.setJarByClass(BaseWordCount.class);
     	    wordCountJob.setMapperClass(BaseWordCount.TokenizerMapper.class);
-    	    wordCountJob.setCombinerClass(BaseWordCount.IntSumReducer.class);
-    	    wordCountJob.setReducerClass(BaseWordCount.IntSumReducer.class);
+    	    wordCountJob.setCombinerClass(IntSumReducer.class);
+    	    wordCountJob.setReducerClass(IntSumReducer.class);
     		break;
 	    }
 	    
@@ -91,14 +92,14 @@ public class WordCount {
 
 		    // set map-reduce properties
 		    sortJob.setJarByClass(CountrySort.class);
-		    sortJob.setMapperClass(CountrySort.TokenizerMapper.class);
-		    sortJob.setCombinerClass(CountrySort.IntSumReducer.class);
-		    sortJob.setReducerClass(CountrySort.IntSumReducer.class);
+		    sortJob.setMapperClass(CountrySort.CountryTokenMapper.class);
+		    sortJob.setReducerClass(CountrySort.CountryCountReducer.class);
 		    
 		    // set processing properties
 		    sortJob.setPartitionerClass(CountrySort.CountryPartitioner.class);
 		    sortJob.setNumReduceTasks(CountryManager.COUNTRIES.length);
-		    sortJob.setGroupingComparatorClass(CountrySort.CountryTokenComparator.class);
+		    sortJob.setGroupingComparatorClass(CountrySort.CountryTokenGroupComparator.class);
+		    sortJob.setSortComparatorClass(CountrySort.CountryTokenSortComparator.class);
 		    
 		    // set output properties
 		    sortJob.setOutputKeyClass(CountryTokenKey.class);
@@ -113,7 +114,11 @@ public class WordCount {
     	printResultsToTerminal(code, outputPath);
     	System.exit(code);
 	  }
-	  
+
+	// ============================================================================================
+	//								PRIVATE REFERENCE METHODS
+	// ============================================================================================
+		
 	/**
 	 * 
 	 * @param dirName
@@ -135,7 +140,7 @@ public class WordCount {
 	 */
 	private static void printResultsToTerminal(int code, String outputPath) {
 		System.out.println("\n===========================================================================");
-		System.out.println("\tJob " + ((code == 0) ? "Complete " : "Failed")
+		System.out.println("\tJob " + ((code == 0) ? "complete " : "failed")
 				+ "! Check log for detailed execution output.");
 		System.out.println("===========================================================================");
 		//System.out.println("\nFinal Partition Outputs Go Here\n");
@@ -169,6 +174,33 @@ public class WordCount {
 		            }
 				}
 			}
+		}
+	}
+
+	// ============================================================================================
+	//										REDUCER CLASS
+	// ============================================================================================
+	
+	/**
+	 * 
+	 */
+	public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+		private IntWritable result = new IntWritable();
+		
+		/**
+		 * 
+		 * @param key
+		 * @param values
+		 * @param context
+		 * @throws IOException
+		 * @throws InterruptedException
+		 */
+		public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+						  throws IOException, InterruptedException {
+			int sum = 0;
+			for (IntWritable val : values) sum += val.get(); 
+			result.set(sum);
+			context.write(key, result);
 		}
 	}
 	  

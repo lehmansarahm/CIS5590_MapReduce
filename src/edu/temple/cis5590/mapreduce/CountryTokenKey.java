@@ -5,26 +5,23 @@ import java.io.DataOutput;
 import java.io.IOException;
 
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.io.Writable;
 import org.apache.hadoop.io.WritableComparable;
 
-public class CountryTokenKey implements Writable, WritableComparable<CountryTokenKey>  {
+public class CountryTokenKey implements WritableComparable<CountryTokenKey> { // Writable, WritableComparable<CountryTokenKey>  {
 	
 	private Text country;	// natural key
 	private Text token;
 	private int count;		// secondary key
 	
-	public CountryTokenKey() {}
-	
-	public void setProps (String country, String token, int count) {
-		this.country = new Text(country);
-		this.token = new Text(token);
-		this.count = count;
+	public CountryTokenKey() {
+		this.country = new Text();
+		this.token = new Text();
+		this.count = 0;
 	}
 	
-	public void setProps (Text country, Text token, int count) {
-		this.country = country;
-		this.token = token;
+	public void setProps (String country, String token, int count) {
+		this.country.set(country);
+		this.token.set(token);
 		this.count = count;
 	}
 	
@@ -44,21 +41,33 @@ public class CountryTokenKey implements Writable, WritableComparable<CountryToke
 	public int compareTo(CountryTokenKey ctk) {
 		int comparison = this.country.compareTo(ctk.getCountry());
 		if (comparison == 0) {
+			comparison = this.token.compareTo(ctk.getToken());
+		}
+		if (comparison == 0) {
 			comparison = (this.count - ctk.getCount());
 		}
-		return -(comparison);	// sort in DESCENDING order
+		return comparison;
 	}
 
 	@Override
-	public void readFields(DataInput arg0) throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void readFields(DataInput in) throws IOException {
+		this.country.readFields(in);
+		this.token.readFields(in);
 	}
 
 	@Override
-	public void write(DataOutput arg0) throws IOException {
-		// TODO Auto-generated method stub
-		
+	public void write(DataOutput out) throws IOException {
+		this.country.write(out);
+		this.token.write(out);
+	}
+	
+	@Override
+	public String toString() {
+		return this.token.toString();
+	}
+	
+	public String toLongString() {
+		return (this.country + "-" + this.token);
 	}
 	
 }

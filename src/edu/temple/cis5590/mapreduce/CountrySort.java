@@ -36,9 +36,7 @@ public class CountrySort {
 	/**
 	 * 
 	 */
-	public static class TokenizerMapper extends Mapper<Object, Text, CountryTokenKey, IntWritable> {
-		private CountryTokenKey ctk;
-		
+	public static class CountryTokenMapper extends Mapper<Object, Text, CountryTokenKey, IntWritable> {
 		/**
 		 * 
 		 * @param key
@@ -55,8 +53,10 @@ public class CountrySort {
 			String countryName = keyValues[0];
 			String token = (keyValues.length >= 2) ? keyValues[1] : keyValues[0];
 			int count = (lineValues.length >= 2) ? Integer.parseInt(lineValues[1]) : 0;
+			Logger.debug("Parsing intermediate value for country: " + countryName 
+					+ ", token: " + token + ", count: " + count);
 			
-			ctk = new CountryTokenKey();
+			CountryTokenKey ctk = new CountryTokenKey();
 			ctk.setProps(countryName, token, count);
 			context.write(ctk, new IntWritable(count));
 		}
@@ -92,12 +92,12 @@ public class CountrySort {
 	/**
 	 * 
 	 */
-	public static class CountryTokenComparator extends WritableComparator {
+	public static class CountryTokenGroupComparator extends WritableComparator {
 		/**
 		 * 
 		 */
-	    public CountryTokenComparator() {
-	        super(CountryTokenKey.class);
+	    public CountryTokenGroupComparator() {
+	        super(CountryTokenKey.class, true);
 	    }
 
 		/**
@@ -106,12 +106,11 @@ public class CountrySort {
 		 * @param w2
 		 */
 	    @SuppressWarnings("rawtypes")
-		@Override
 	    public int compare(WritableComparable w1, WritableComparable w2) {
-	    	Logger.info("Comparing values: " + w1.toString() + " and " + w2.toString());
 	    	CountryTokenKey key1 = (CountryTokenKey) w1;
 	    	CountryTokenKey key2 = (CountryTokenKey) w2;
-	    	return (key1.getCountry().compareTo(key2.getCountry()));
+	    	Logger.info("Comparing values: " + key1.toLongString() + " and " + key2.toLongString());
+	    	return (key1.compareTo(key2));	// key distinct by country, token, count
 	    }
 	}
 
@@ -122,7 +121,7 @@ public class CountrySort {
 	/**
 	 * 
 	 */
-	public static class IntSumReducer extends Reducer<CountryTokenKey, IntWritable, Text, IntWritable> {
+	public static class CountryCountReducer extends Reducer<CountryTokenKey, IntWritable, CountryTokenKey, IntWritable> {
 		private IntWritable result = new IntWritable();
 		
 		/**
@@ -138,8 +137,39 @@ public class CountrySort {
 			int sum = 0;
 			for (IntWritable val : values) sum += val.get(); 
 			result.set(sum);
-			context.write(key.getToken(), result);
+			
+			Logger.debug("Total values found,Key: " + key + ",Count: " + sum);
+			context.write(key, result);
 		}
+	}
+
+	// ============================================================================================
+	//										SORT
+	// ============================================================================================
+	
+	/**
+	 * 
+	 */
+	public static class CountryTokenSortComparator extends WritableComparator {
+		/**
+		 * 
+		 */
+	    public CountryTokenSortComparator() {
+	        super(CountryTokenKey.class, true);
+	    }
+
+		/**
+		 * 
+		 * @param w1
+		 * @param w2
+		 */
+	    @SuppressWarnings("rawtypes")
+	    public int compare(WritableComparable w1, WritableComparable w2) {
+	    	CountryTokenKey key1 = (CountryTokenKey) w1;
+	    	CountryTokenKey key2 = (CountryTokenKey) w2;
+	    	Logger.info("Sorting values: " + key1.toLongString() + " and " + key2.toLongString());
+	    	return -1 * (key1.getCount() - key2.getCount());
+	    }
 	}
   
 }
