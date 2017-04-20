@@ -103,8 +103,8 @@ public class CountryTokenKey implements WritableComparable<CountryTokenKey> { //
 	@Override
 	public String toString() {
 		if (this.token.toString().equals(TOTAL_TOKEN))
-			return this.country + " (" + TOTAL_TOKEN + ")";
-		else return this.token.toString();
+			return this.country + " - " + TOTAL_TOKEN;
+		else return this.country + " - " + this.token;
 	}
 	
 	public String toLongString() {

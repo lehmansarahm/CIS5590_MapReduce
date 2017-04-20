@@ -15,6 +15,8 @@
 package edu.temple.cis5590.mapreduce;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -116,35 +118,6 @@ public class CountrySort {
 	}
 
 	// ============================================================================================
-	//										GROUP
-	// ============================================================================================
-	
-	/**
-	 * 
-	 */
-	public static class CountryTokenGroupComparator extends WritableComparator {
-		/**
-		 * 
-		 */
-	    public CountryTokenGroupComparator() {
-	        super(CountryTokenKey.class, true);
-	    }
-
-		/**
-		 * 
-		 * @param w1
-		 * @param w2
-		 */
-	    @SuppressWarnings("rawtypes")
-	    public int compare(WritableComparable w1, WritableComparable w2) {
-	    	CountryTokenKey key1 = (CountryTokenKey) w1;
-	    	CountryTokenKey key2 = (CountryTokenKey) w2;
-	    	Logger.info("Group phase,Grouping values: " + key1.toLongString() + " and " + key2.toLongString());
-	    	return (key1.groupBy(key2));	// group by country and token names
-	    }
-	}
-
-	// ============================================================================================
 	//										REDUCE
 	// ============================================================================================
 	
@@ -153,6 +126,9 @@ public class CountrySort {
 	 */
 	public static class CountryCountReducer extends Reducer<CountryTokenKey, IntWritable, CountryTokenKey, IntWritable> {
 		private IntWritable result = new IntWritable();
+		private Map<String,Integer> countryCounts = new HashMap<String,Integer>();
+		
+		public static boolean limitResults = false;
 		
 		/**
 		 * 
@@ -163,6 +139,33 @@ public class CountrySort {
 		 * @throws InterruptedException
 		 */
 		public void reduce(CountryTokenKey key, Iterable<IntWritable> values, Context context) 
+						  throws IOException, InterruptedException {
+
+			if (limitResults) {
+				String countryName = key.getCountry().toString();
+				if (!countryCounts.containsKey(countryName)) {
+					// initialize count for country name
+					countryCounts.put(countryName, 0);
+				}
+
+				int countryCount = countryCounts.get(countryName);
+				if (countryCount < 4) sumValues(key, values, context);
+
+				countryCount++;
+				countryCounts.put(countryName, countryCount);
+			}
+			else sumValues(key, values, context);
+		}
+		
+		/**
+		 * 
+		 * @param key
+		 * @param values
+		 * @param context
+		 * @throws IOException
+		 * @throws InterruptedException
+		 */
+		private void sumValues(CountryTokenKey key, Iterable<IntWritable> values, Context context) 
 						  throws IOException, InterruptedException {
 			int sum = 0;
 			for (IntWritable val : values) sum += val.get(); 

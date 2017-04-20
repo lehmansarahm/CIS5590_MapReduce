@@ -77,7 +77,8 @@ public class CountryManager {
 	 */
 	private static int getPartitionForCountryName(String countryName) {
 		for (int i = 0; i < COUNTRIES.length; i++) {
-			if (COUNTRIES[i].equalsIgnoreCase(countryName)) {
+			if (COUNTRIES[i].equalsIgnoreCase(countryName) || 
+					countryName.contains(COUNTRIES[i])) {
 				return i;
 			}
 		}
