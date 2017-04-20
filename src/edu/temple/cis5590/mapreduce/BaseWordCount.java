@@ -34,7 +34,7 @@ public class BaseWordCount {
 	 * 
 	 */
 	public static class TokenizerMapper extends Mapper<Object, Text, Text, IntWritable>{
-		private final static String[] TARGET_WORDS = 
+		public final static String[] TARGET_WORDS = 
 				new String[] { "economy", "education", "government", "sports" };
 		
 		private final static IntWritable ZERO = new IntWritable(0);

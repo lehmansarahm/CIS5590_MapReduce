@@ -18,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -117,6 +119,9 @@ public class WordCount {
 		    code = sortJob.waitForCompletion(true) ? 0 : 1;
 	    }
 	    
+	    // identify countries with same results
+	    compareResults(outputPath);
+	    
 	    // print results and finish up
     	Logger.writeResultsToLog();
     	printResultsToTerminal(code, outputPath);
@@ -130,6 +135,7 @@ public class WordCount {
 	/**
 	 * 
 	 * @param dirName
+	 * @param retainOrigDir
 	 */
 	private static void resetDirectory(String dirName, boolean retainOrigDir) {
 		File folder = new File(dirName);
@@ -145,6 +151,53 @@ public class WordCount {
 	
 	/**
 	 * 
+	 * @param outputPath
+	 */
+	private static void compareResults(String outputPath) {
+		File outputFolder = new File(outputPath);
+		List<CountryTokenRank> ctrList = new ArrayList<CountryTokenRank>();
+		File rankMatchOutputFile = new File(outputFolder.getPath(), "rankMatch");
+		
+		if (outputFolder.exists() && outputFolder.isDirectory()) {
+			String[] files = outputFolder.list();
+			for (String filename: files) {
+				if (filename.contains("part")) {	// make sure we're only grabbing the partition output files
+					File currentFile = new File(outputFolder.getPath(), filename);
+		            try {
+		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
+						CountryTokenRank ctr = new CountryTokenRank();
+						boolean contentWritten = false;
+		                String line;
+		                while ((line = br.readLine()) != null) {
+		                	// filter out unicode fluff
+		                	if (!line.startsWith("crc")) {
+			                    ctr.parseToken(line);
+			                    contentWritten = true;
+		                	}
+		                }
+		                if (contentWritten) ctrList.add(ctr);
+		                br.close();
+		            } catch (IOException e) {
+		                Logger.info("Could not read file: " + e.toString());
+		                Logger.error("File read failed: " + e.toString());
+		            }
+				}
+			}
+		}
+		
+		for (int i = 0; i < ctrList.size(); i++) {
+			CountryTokenRank ctr = ctrList.get(i);
+			for (int j = 0; j < ctrList.size(); j++) {
+				if (i != j) ctr.compare(ctrList.get(j)); 
+			}
+			ctr.writeMatchesToFile(rankMatchOutputFile);
+		}
+	}
+	
+	/**
+	 * 
+	 * @param code
+	 * @param outputPath
 	 */
 	private static void printResultsToTerminal(int code, String outputPath) {
 		System.out.println("\n===========================================================================");
@@ -157,7 +210,8 @@ public class WordCount {
 		if (outputFolder.exists() && outputFolder.isDirectory()) {
 			String[] files = outputFolder.list();
 			for (String filename: files) {
-				if (filename.contains("part")) {	// make sure we're grabbing the partition output files
+				// make sure we're only grabbing the partition and rank comparison output files
+				if (filename.contains("part") || filename.contains("rank")) {
 					File currentFile = new File(outputFolder.getPath(), filename);
 		            try {
 		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
