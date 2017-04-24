@@ -10,7 +10,7 @@
 	    <property name="jar.file"      value="${jar.dir}/CIS5590_MapReduce_Lehman.jar"/>
 	    <property name="manifest.file" value="${jar.dir}/MANIFEST.MF"/>
 
-	    <property name="main.class" value="edu.temple.cis5590.mapreduce.WordCount"/>
+	    <property name="main.class" value="edu.temple.cis5590.mapreduce.MapReduce"/>
 
 	    <path id="external.jars">
 	        <fileset dir="${lib.dir}" includes="**/*.jar"/>

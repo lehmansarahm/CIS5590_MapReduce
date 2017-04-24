@@ -7,248 +7,105 @@
 //	Email:		smlehman@temple.edu
 //
 //	Program:	Semester Project, AWS Hadoop Map-Reduce
-//  Sources:	https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
-//				https://www.tutorialspoint.com/map_reduce/map_reduce_partitioner.htm
 //
 // =======================================================================
 
 package edu.temple.cis5590.mapreduce;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.StringTokenizer;
 
-import org.apache.hadoop.conf.Configuration;
-import org.apache.hadoop.fs.Path;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
-import org.apache.hadoop.mapreduce.Job;
+import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Reducer;
-import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
-import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
-/**
- * 
- */
 public class WordCount {
-
-	private static final String DEFAULT_PROCESSING_TYPE = "base";
-	private static final String DEFAULT_INPUT_PATH = "input";
-	private static final String DEFAULT_INTERMEDIATE_PATH = "intermediate";
-	private static final String DEFAULT_OUTPUT_PATH = "output";
-
-	/**
-	 * Expected arguments:
-	 * args[0] = word count processing type
-	 * args[1] = input path
-	 * args[2] = output path (to be overwritten if already exists)
-	 */
-	  public static void main(String[] args) throws Exception {
-	    String processingType = (args.length >= 1) ? args[0] : DEFAULT_PROCESSING_TYPE;
-	    String inputPath = (args.length >= 2) ? args[1] : DEFAULT_INPUT_PATH;
-	    String intermPath = DEFAULT_INTERMEDIATE_PATH;
-	    String outputPath = (args.length >= 3) ? args[2] : DEFAULT_OUTPUT_PATH;
-	    String logsPath = (args.length >= 4) ? args[3] : Logger.DEFAULT_LOGS_PATH;
-	    
-	    // if intermediate, output, and log folders already exist, delete 
-	    // them and all of their contents so we can do a fresh write
-	    resetDirectory(intermPath, false);
-	    resetDirectory(outputPath, false);
-	    resetDirectory(logsPath, true);
-		    
-	    Configuration conf = new Configuration();
-	    Job wordCountJob = Job.getInstance(conf, "wordCount");
-	    FileInputFormat.addInputPath(wordCountJob, new Path(inputPath));
-	    FileOutputFormat.setOutputPath(wordCountJob, new Path(intermPath));
-	    
-	    // set the processing type specific classes
-	    boolean limitTopResults = false;
-	    switch (processingType.toLowerCase()) {
-	    case "popular":
-		    wordCountJob.setJarByClass(PopularWordCount.class);
-		    wordCountJob.setMapperClass(PopularWordCount.TokenizerMapper.class);
-		    wordCountJob.setCombinerClass(IntSumReducer.class);
-		    wordCountJob.setReducerClass(IntSumReducer.class);
-		    limitTopResults = true;
-	    	break;
-    	default:
-    	    wordCountJob.setJarByClass(BaseWordCount.class);
-    	    wordCountJob.setMapperClass(BaseWordCount.TokenizerMapper.class);
-    	    wordCountJob.setCombinerClass(IntSumReducer.class);
-    	    wordCountJob.setReducerClass(IntSumReducer.class);
-    		break;
-	    }
-	    
-	    // set common output properties
-	    wordCountJob.setOutputKeyClass(Text.class);
-	    wordCountJob.setOutputValueClass(IntWritable.class);
-
-	    // run the job!
-	    int code = wordCountJob.waitForCompletion(true) ? 0 : 1;
-	    if (code == 0) {
-	    	// word count finished successfully ... run the sorting job
-		    Job sortJob = Job.getInstance(conf, "countrySort");
-		    FileInputFormat.addInputPath(sortJob, new Path(intermPath));
-		    
-		    // depending on whether we are limiting the final 
-		    // results, change the output path
-		    FileOutputFormat.setOutputPath(sortJob,new Path(outputPath));
-
-		    // set map-reduce properties
-		    sortJob.setJarByClass(CountrySort.class);
-		    sortJob.setMapperClass(CountrySort.CountryTokenMapper.class);
-		    sortJob.setCombinerClass(CountrySort.CountryCountReducer.class);
-		    sortJob.setReducerClass(CountrySort.CountryCountReducer.class);
-		    CountrySort.CountryCountReducer.limitResults = limitTopResults;
-		    
-		    // set processing properties
-		    sortJob.setPartitionerClass(CountrySort.CountryPartitioner.class);
-		    sortJob.setNumReduceTasks(CountryManager.COUNTRIES.length);
-		    sortJob.setSortComparatorClass(CountrySort.CountryTokenSortComparator.class);
-		    
-		    // set output properties
-		    sortJob.setMapOutputKeyClass(CountryTokenKey.class);
-		    sortJob.setMapOutputValueClass(IntWritable.class);
-		    sortJob.setOutputKeyClass(CountryTokenKey.class);
-		    sortJob.setOutputValueClass(IntWritable.class);
-		    
-		    // run the job!
-		    code = sortJob.waitForCompletion(true) ? 0 : 1;
-	    }
-	    
-	    // identify countries with same results
-	    compareResults(outputPath);
-	    
-	    // print results and finish up
-    	Logger.writeResultsToLog();
-    	printResultsToTerminal(code, outputPath);
-    	System.exit(code);
-	  }
-
-	// ============================================================================================
-	//								PRIVATE REFERENCE METHODS
-	// ============================================================================================
-		
-	/**
-	 * 
-	 * @param dirName
-	 * @param retainOrigDir
-	 */
-	private static void resetDirectory(String dirName, boolean retainOrigDir) {
-		File folder = new File(dirName);
-		if (folder.exists() && folder.isDirectory()) {
-			String[] files = folder.list();
-			for (String file: files) {
-				File currentFile = new File(folder.getPath(), file);
-				currentFile.delete();
-			}
-			if (!retainOrigDir) folder.delete();
-		} else if (retainOrigDir) folder.mkdir();
-	}
 	
+	private final static String[] TARGET_WORDS = 
+			new String[] { "economy", "education", "government", "sports" };
+	
+	public static enum WORD_COUNT_MODE { Target, Popular };
+	private static WORD_COUNT_MODE mode = WORD_COUNT_MODE.Target;
+
+	// ============================================================================================
+	//										MAP
+	// ============================================================================================
+
 	/**
 	 * 
-	 * @param outputPath
 	 */
-	private static void compareResults(String outputPath) {
-		File outputFolder = new File(outputPath);
-		List<CountryTokenRank> ctrList = new ArrayList<CountryTokenRank>();
-		File rankMatchOutputFile = new File(outputFolder.getPath(), "rankMatch");
+	public static class WordCountMapper extends Mapper<Object, Text, Text, WordCountTracker> {
+
+		private Text countryText = new Text();
+		private boolean init = false;
 		
-		if (outputFolder.exists() && outputFolder.isDirectory()) {
-			String[] files = outputFolder.list();
-			for (String filename: files) {
-				if (filename.contains("part")) {	// make sure we're only grabbing the partition output files
-					File currentFile = new File(outputFolder.getPath(), filename);
-		            try {
-		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
-						CountryTokenRank ctr = new CountryTokenRank();
-						boolean contentWritten = false;
-		                String line;
-		                while ((line = br.readLine()) != null) {
-		                	// filter out unicode fluff
-		                	if (!line.startsWith("crc")) {
-			                    ctr.parseToken(line);
-			                    contentWritten = true;
-		                	}
-		                }
-		                if (contentWritten) ctrList.add(ctr);
-		                br.close();
-		            } catch (IOException e) {
-		                Logger.info("Could not read file: " + e.toString());
-		                Logger.error("File read failed: " + e.toString());
-		            }
+		/**
+		 * 
+		 * @param key
+		 * @param value
+		 * @param context
+		 * @throws IOException
+		 * @throws InterruptedException
+		 */
+		public void map(Object key, Text value, Context context) 
+					    throws IOException, InterruptedException {
+			boolean isTargetMode = (mode == WORD_COUNT_MODE.Target);
+			boolean isPopularMode = (mode == WORD_COUNT_MODE.Popular);
+			
+			if (isTargetMode && !init) {
+				initializeTokens(context);
+				init = true;
+			}
+			
+			String countryName = Utils.getCountryName(context);
+			countryText.set(countryName);
+			WordCountTracker wc = new WordCountTracker(countryName, 
+					(isTargetMode ? TARGET_WORDS.length : 3));
+			
+			StringTokenizer itr = new StringTokenizer(value.toString());
+			while (itr.hasMoreTokens()) {
+				String token = itr.nextToken()/*.replaceAll("[^a-zA-Z ]", "")*/.toLowerCase();
+				if (isPopularMode) wc.insert(token);
+				else if (isTargetMode) {
+					for (int i = 0; i < TARGET_WORDS.length; i++) {
+						if (token.contains(TARGET_WORDS[i])) {
+							wc.insert(TARGET_WORDS[i]);
+							break;
+						}
+					}
 				}
 			}
+			
+			context.write(countryText, wc);
 		}
 		
-		for (int i = 0; i < ctrList.size(); i++) {
-			CountryTokenRank ctr = ctrList.get(i);
-			for (int j = 0; j < ctrList.size(); j++) {
-				if (i != j) ctr.compare(ctrList.get(j)); 
+		/**
+		 * 
+		 * @param context
+		 * @throws IOException
+		 * @throws InterruptedException
+		 */
+		private void initializeTokens(Context context)
+									  throws IOException, InterruptedException {
+			String countryName = Utils.getCountryName(context);
+			countryText.set(countryName);
+			WordCountTracker wc = new WordCountTracker(countryName, TARGET_WORDS.length);
+			for (int i = 0; i < TARGET_WORDS.length; i++) {
+				wc.insertToken(TARGET_WORDS[i], 0);
 			}
-			ctr.writeMatchesToFile(rankMatchOutputFile);
+			context.write(countryText, wc);
 		}
-	}
-	
-	/**
-	 * 
-	 * @param code
-	 * @param outputPath
-	 */
-	private static void printResultsToTerminal(int code, String outputPath) {
-		System.out.println("\n===========================================================================");
-		System.out.println("\tJob " + ((code == 0) ? "complete " : "failed")
-				+ "! Check log for detailed execution output.");
-		System.out.println("===========================================================================");
-		//System.out.println("\nFinal Partition Outputs Go Here\n");
-
-		File outputFolder = new File(outputPath);
-		if (outputFolder.exists() && outputFolder.isDirectory()) {
-			String[] files = outputFolder.list();
-			for (String filename: files) {
-				// make sure we're only grabbing the partition and rank comparison output files
-				if (filename.contains("part") || filename.contains("rank")) {
-					File currentFile = new File(outputFolder.getPath(), filename);
-		            try {
-		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
-		                boolean contentWritten = false;
-		                
-		                String line;
-		                while ((line = br.readLine()) != null) {
-		                	// filter out unicode fluff
-		                	if (!line.startsWith("crc")) {
-			                    System.out.println(line);
-			                    contentWritten = true;
-		                	}
-		                }
-		                
-		                if (contentWritten) {
-		                	System.out.println("===========================================================================");
-		                }
-		                br.close();
-		            } catch (IOException e) {
-		                Logger.info("Could not read file: " + e.toString());
-		                Logger.error("File read failed: " + e.toString());
-		            }
-				}
-			}
-		}
+		
 	}
 
 	// ============================================================================================
-	//										REDUCER CLASS
+	//											REDUCE
 	// ============================================================================================
 	
 	/**
 	 * 
 	 */
-	public static class IntSumReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
-		private IntWritable result = new IntWritable();
-		
+	public static class WordCountReducer extends Reducer<Text, WordCountTracker, Text, WordCountTracker> {
 		/**
 		 * 
 		 * @param key
@@ -257,13 +114,25 @@ public class WordCount {
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+		public void reduce(Text key, Iterable<WordCountTracker> values, Context context) 
 						  throws IOException, InterruptedException {
-			int sum = 0;
-			for (IntWritable val : values) sum += val.get(); 
-			result.set(sum);
-			context.write(key, result);
+			WordCountTracker wc = new WordCountTracker(key.toString(), TARGET_WORDS.length);
+			Logger.info("Reducing word counts for country: " + key);
+			for (WordCountTracker val : values) wc.insert(val);
+			context.write(key, wc);
 		}
 	}
-	  
+
+	// ============================================================================================
+	//											COMMON
+	// ============================================================================================
+
+	/**
+	 * 
+	 * @param newMode
+	 */
+	public static void setMode(WORD_COUNT_MODE newMode) {
+		mode = newMode;
+	}
+	
 }
