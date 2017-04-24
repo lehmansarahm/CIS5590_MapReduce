@@ -159,13 +159,8 @@ public class WordCount {
 			List<Map.Entry<String, Integer>> rankedTokens = rankTokenMap(reducedTokens);
 			for (Map.Entry<String, Integer> pair : rankedTokens) {
 				if (writeCount < writeLimit) {
-			        String newKey = (key + "-" + (String)pair.getKey());
-			        int newValue = (Integer)pair.getValue();
-			        Logger.info("Inserting final token for key: " 
-			        		+ newKey + ",And value: " + newValue);
-			        
-			        tokenText.set(newKey);
-			        totalCount.set(newValue);
+			        tokenText.set(key + " - " + (String)pair.getKey());
+			        totalCount.set((Integer)pair.getValue());
 			        context.write(tokenText, totalCount);
 			        writeCount++;
 				} else break;
