@@ -58,7 +58,6 @@ public class MapReduce {
 		// set common processing properties
 		wordCountJob.setJarByClass(WordCount.class);
 	    wordCountJob.setMapperClass(WordCount.WordCountMapper.class);
-		wordCountJob.setCombinerClass(WordCount.WordCountReducer.class);
 		wordCountJob.setReducerClass(WordCount.WordCountReducer.class);
 		
 		// set the processing-type-specific properties
@@ -72,6 +71,8 @@ public class MapReduce {
 		}
 		
 		// set common output properties
+		wordCountJob.setMapOutputKeyClass(Text.class);
+		wordCountJob.setMapOutputValueClass(Text.class);
 		wordCountJob.setOutputKeyClass(Text.class);
 		wordCountJob.setOutputValueClass(IntWritable.class);
 		

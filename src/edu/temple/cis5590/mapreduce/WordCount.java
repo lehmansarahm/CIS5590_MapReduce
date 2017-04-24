@@ -13,10 +13,10 @@
 package edu.temple.cis5590.mapreduce;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -42,10 +42,10 @@ public class WordCount {
 	/**
 	 * 
 	 */
-	public static class WordCountMapper extends Mapper<Object, Text, Text, IntWritable> {
+	public static class WordCountMapper extends Mapper<Object, Text, Text, Text> {
 
+		private Text countryText = new Text();
 		private Text tokenText = new Text();
-		private IntWritable countIW = new IntWritable();
 		
 		/**
 		 * 
@@ -55,11 +55,12 @@ public class WordCount {
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		@SuppressWarnings("rawtypes")
 		public void map(Object key, Text value, Context context) 
 					    throws IOException, InterruptedException {
 			boolean isTargetMode = (mode == WORD_COUNT_MODE.Target);
 			boolean isPopularMode = (mode == WORD_COUNT_MODE.Popular);
+			String countryName = Utils.getCountryName(context);
+			countryText.set(countryName);
 			
 			Map<String,Integer> tokens = new HashMap<String,Integer>();
 			if (isTargetMode) {
@@ -70,8 +71,8 @@ public class WordCount {
 			
 			StringTokenizer itr = new StringTokenizer(value.toString());
 			while (itr.hasMoreTokens()) {
-				String token = itr.nextToken().toLowerCase();
-				if (isPopularMode) {
+				String token = itr.nextToken().replaceAll("[^A-Za-z0-9 ]", "").trim().toLowerCase();
+				if (isPopularMode && token.length() >= 5) {
 					tokens = insert(tokens, token, 1);
 				} else if (isTargetMode) {
 					for (int i = 0; i < TARGET_WORDS.length; i++) {
@@ -84,14 +85,15 @@ public class WordCount {
 			}
 			
 			// only write the most popular tokens to the context
-			String countryName = Utils.getCountryName(context);
-			Map<String,Integer> rankedTokenMap = rankTokenMap(tokens);
-			Iterator it = rankedTokenMap.entrySet().iterator();
-			while (it.hasNext()) {
-		        Map.Entry pair = (Map.Entry)it.next();
-		        tokenText.set(countryName + "-" + (String)pair.getKey());
-		        countIW.set((Integer)pair.getValue());
-		        context.write(tokenText, countIW);
+			int writeCount = 0;
+			int writeLimit = (isPopularMode ? 3 : TARGET_WORDS.length);
+			List<Map.Entry<String, Integer>> rankedTokens = rankTokenMap(tokens);
+			for (Map.Entry<String, Integer> pair : rankedTokens) {
+				if (writeCount < writeLimit) {
+			        tokenText.set((String)pair.getKey() + "-" + (Integer)pair.getValue());
+			        context.write(countryText, tokenText);
+			        writeCount++;
+				} else break;
 			}
 		}
 		
@@ -100,17 +102,16 @@ public class WordCount {
 	/**
 	 * 
 	 */
-	public static class WordCountPartitioner extends Partitioner<Text, IntWritable> {
+	public static class WordCountPartitioner extends Partitioner<Text, Text> {
 		
 		/**
 		 * 
 		 */
 		@Override
-		public int getPartition(Text key, IntWritable val, int numPartitions) {
-		    String[] keys = key.toString().split("-");
+		public int getPartition(Text key, Text val, int numPartitions) {
 		    int partition = 0;
 		    for (int i = 0; i < Utils.COUNTRIES.length; i++) {
-		    	if (keys[0].equals(Utils.COUNTRIES[i])) {
+		    	if (key.equals(Utils.COUNTRIES[i])) {
 		    		partition = i;
 		    		break;
 		    	}
@@ -127,9 +128,10 @@ public class WordCount {
 	/**
 	 * 
 	 */
-	public static class WordCountReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+	public static class WordCountReducer extends Reducer<Text, Text, Text, IntWritable> {
 		
-		private IntWritable result = new IntWritable();
+		private Text tokenText = new Text();
+		private IntWritable totalCount = new IntWritable();
 		
 		/**
 		 * 
@@ -139,13 +141,35 @@ public class WordCount {
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
-		public void reduce(Text key, Iterable<IntWritable> values, Context context) 
+		public void reduce(Text key, Iterable<Text> values, Context context) 
 				  throws IOException, InterruptedException {
-			Logger.info("Reducing word counts for token: " + key);
-			int sum = 0;
-			for (IntWritable val : values) sum += val.get();
-			result.set(sum);
-			context.write(key, result);
+			// update the log
+			Logger.info("Reducing word counts for country: " + key);
+			
+			// consolidate the tokens
+			Map<String,Integer> reducedTokens = new HashMap<String,Integer>();
+			for (Text val : values) {
+				String[] tokenCount = val.toString().split("-");
+				reducedTokens = insert(reducedTokens, tokenCount[0], Integer.parseInt(tokenCount[1]));
+			}
+			
+			// only write the most popular tokens to the context
+			int writeCount = 0;
+			int writeLimit = (mode == WORD_COUNT_MODE.Popular ? 3 : TARGET_WORDS.length);
+			List<Map.Entry<String, Integer>> rankedTokens = rankTokenMap(reducedTokens);
+			for (Map.Entry<String, Integer> pair : rankedTokens) {
+				if (writeCount < writeLimit) {
+			        String newKey = (key + "-" + (String)pair.getKey());
+			        int newValue = (Integer)pair.getValue();
+			        Logger.info("Inserting final token for key: " 
+			        		+ newKey + ",And value: " + newValue);
+			        
+			        tokenText.set(newKey);
+			        totalCount.set(newValue);
+			        context.write(tokenText, totalCount);
+			        writeCount++;
+				} else break;
+			}
 		}
 		
 	}
@@ -183,35 +207,18 @@ public class WordCount {
 	 * @param tokenMap
 	 * @return
 	 */
-	public static Map<String,Integer> rankTokenMap(Map<String,Integer> tokenMap) {
-	    Map<String,Integer> sortedMap = new HashMap<>();
-	    List<String> tokens = new ArrayList<>(tokenMap.keySet());
-	    Collections.sort(tokens);
-	    
-	    List<Integer> tokenCounts = new ArrayList<>(tokenMap.values());
-	    Collections.sort(tokenCounts);
-
-	    int sortCount = 0;
-	    int sortLimit = (mode == WORD_COUNT_MODE.Popular) ? 3 : TARGET_WORDS.length;
-	    
-	    Iterator<Integer> countIt = tokenCounts.iterator();
-	    while (countIt.hasNext()) {
-	        int tokenCount = countIt.next();
-	        Iterator<String> tokenIt = tokens.iterator();
-	        while (tokenIt.hasNext() && sortCount < sortLimit) {
-	            String token = tokenIt.next();
-	            int comp1 = tokenMap.get(token);
-	            int comp2 = tokenCount;
-	            if (comp1 == comp2) {
-	                tokenIt.remove();
-	                sortedMap.put(token, tokenCount);
-	                sortCount++;
-	                break;
-	            }
-	        }
-	    }
-	    
-	    return sortedMap;
+	public static List<Map.Entry<String, Integer>> rankTokenMap(Map<String,Integer> tokenMap) {
+		List<Map.Entry<String, Integer>> list =
+		        new LinkedList<Map.Entry<String, Integer>>(tokenMap.entrySet());
+		
+		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+		    public int compare(Map.Entry<String, Integer> o1,
+		                       Map.Entry<String, Integer> o2) {
+		        return -1 * (o1.getValue()).compareTo(o2.getValue());
+		    }
+		});
+		
+		return list;
 	}
 	
 }
