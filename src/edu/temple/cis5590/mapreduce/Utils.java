@@ -98,16 +98,25 @@ public class Utils {
 			String[] files = outputFolder.list();
 			for (String filename: files) {
 				// make sure we're only grabbing the partition and rank comparison output files
-				if (filename.contains("part") || filename.contains("rank")) {
+				boolean isPartitionFile = filename.contains("part");
+				boolean isRankMatchFile = filename.contains("rank");
+				if (isPartitionFile || isRankMatchFile) {
 					File currentFile = new File(outputFolder.getPath(), filename);
 		            try {
 		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
 		                boolean contentWritten = false;
 		                
 		                String line;
+		                String prevCountry = "";
 		                while ((line = br.readLine()) != null) {
 		                	// filter out unicode fluff
 		                	if (!line.startsWith("crc")) {
+		                		String[] countryTokenCount = line.split("-");
+		                		String currentCountry = countryTokenCount[0].trim();
+		                		if (!isRankMatchFile && !currentCountry.equals(prevCountry)) {
+				                	System.out.println("===========================================================================");
+				                	prevCountry = currentCountry;
+		                		}
 			                    System.out.println(line);
 			                    contentWritten = true;
 		                	}
