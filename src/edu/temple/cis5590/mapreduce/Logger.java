@@ -7,17 +7,12 @@
 //	Email:		smlehman@temple.edu
 //
 //	Program:	Semester Project, AWS Hadoop Map-Reduce
-//  Sources:	https://hadoop.apache.org/docs/stable/hadoop-mapreduce-client/hadoop-mapreduce-client-core/MapReduceTutorial.html
-//				https://www.tutorialspoint.com/map_reduce/map_reduce_partitioner.htm
 //
 // =======================================================================
 
 package edu.temple.cis5590.mapreduce;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
@@ -62,21 +57,9 @@ public class Logger {
 	
 	/**
 	 * 
-	 * @param entry
 	 */
 	public static void writeResultsToLog() {
-        try {
-            if (!log.exists()) log.createNewFile();
-            FileOutputStream fos = new FileOutputStream(log);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            osw.append(logContents);
-
-            osw.close();
-            fos.flush();
-            fos.close();
-        } catch (IOException e) {
-            System.out.println("File write failed: " + e.toString());
-        }
+		Utils.writeToFile(log, logContents);
 	}
 	
 	/**

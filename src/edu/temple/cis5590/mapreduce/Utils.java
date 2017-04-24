@@ -1,16 +1,33 @@
+// =======================================================================
+//
+//	Course:		CIS 5590, Spring 2017
+//	Professor:	X. He
+//	
+//	Author:		Sarah M. Lehman
+//	Email:		smlehman@temple.edu
+//
+//	Program:	Semester Project, AWS Hadoop Map-Reduce
+//
+// =======================================================================
+
 package edu.temple.cis5590.mapreduce;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
 public class Utils {
 
-	private final static String[] COUNTRIES = 
+	public final static String[] COUNTRIES = 
 			new String[] { "Denmark", "Finland", "France", "Ireland", "Netherlands", 
 					"Norway", "Sweden", "Switzerland", "United Kingdom", "United States" };
 
@@ -29,6 +46,39 @@ public class Utils {
 			}
 			if (!retainOrigDir) folder.delete();
 		} else if (retainOrigDir) folder.mkdir();
+	}
+	
+	/**
+	 * 
+	 * @param inputDirName
+	 * @param outputDirName
+	 * @throws FileNotFoundException 
+	 */
+	public static void parseInputFiles(String inputDirName, String outputDirName) throws IOException {
+		File outFolder = new File(outputDirName);
+		if (!outFolder.exists()) outFolder.mkdir();
+		
+		int counter = 0;
+		File inFolder = new File(inputDirName);
+		if (inFolder.exists() && inFolder.isDirectory()) {
+			String[] files = inFolder.list();
+			for (String file: files) {
+				// retrieve original input file
+				File currentFile = new File(inFolder.getPath(), file);
+				String fileName = currentFile.getName();
+				String country = fileName.substring(0, fileName.indexOf("."));
+				
+				// parse original input file
+				List<String> fileChunks = readFile(currentFile);
+				for (String fileChunk : fileChunks) {
+					// write new intermediate file
+		        	String newFileName = country + "." + counter + ".txt";
+		            File newFile = new File(outFolder.getPath(), newFileName);
+		            writeToFile(newFile, fileChunk);
+		            counter++;
+				}
+			}
+		} else Logger.error("CANNOT PARSE INPUT FILES FROM DIRECTORY: " + inputDirName);
 	}
 	
 	/**
@@ -95,6 +145,51 @@ public class Utils {
 		}
 		
 		return countryName;
+	}
+	
+	/**
+	 * 
+	 * @param file
+	 * @return
+	 */
+	public static List<String> readFile(File file) {
+		List<String> out = new ArrayList<String>();
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(file));
+			int counter = 0;
+	        String line, chunk = "";
+	        while((line=br.readLine()) != null){
+	            chunk += line;
+	            counter++;
+	            if (counter % 100 == 0) {
+	            	out.add(chunk);
+	            	chunk = "";
+	            }
+	        }
+	        br.close();
+		} catch (IOException e) {
+            System.out.println("File write failed: " + e.toString());
+		}
+		return out;
+	}
+	
+	/**
+	 * 
+	 * @param entry
+	 */
+	public static void writeToFile(File file, String fileContents) {
+        try {
+            if (!file.exists()) file.createNewFile();
+            FileOutputStream fos = new FileOutputStream(file);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+            osw.append(fileContents);
+
+            osw.close();
+            fos.flush();
+            fos.close();
+        } catch (IOException e) {
+            System.out.println("File write failed: " + e.toString());
+        }
 	}
 	
 }

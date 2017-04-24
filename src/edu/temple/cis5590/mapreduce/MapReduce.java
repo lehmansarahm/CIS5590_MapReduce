@@ -14,6 +14,7 @@ package edu.temple.cis5590.mapreduce;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
@@ -25,7 +26,6 @@ public class MapReduce {
 
 	private static final String DEFAULT_PROCESSING_TYPE = "base";
 	private static final String DEFAULT_INPUT_PATH = "input";
-	private static final String DEFAULT_INTERMEDIATE_PATH = "intermediate";
 	private static final String DEFAULT_OUTPUT_PATH = "output";
 	
 	/**
@@ -37,13 +37,11 @@ public class MapReduce {
 	public static void main(String[] args) throws Exception {
 		String processingType = (args.length >= 1) ? args[0] : DEFAULT_PROCESSING_TYPE;
 		String inputPath = (args.length >= 2) ? args[1] : DEFAULT_INPUT_PATH;
-		String intermPath = DEFAULT_INTERMEDIATE_PATH;
 		String outputPath = (args.length >= 3) ? args[2] : DEFAULT_OUTPUT_PATH;
 		String logsPath = (args.length >= 4) ? args[3] : Logger.DEFAULT_LOGS_PATH;
 		
 		// if intermediate, output, and log folders already exist, delete 
 		// them and all of their contents so we can do a fresh write
-		Utils.resetDirectory(intermPath, false);
 		Utils.resetDirectory(outputPath, false);
 		Utils.resetDirectory(logsPath, true);
 		
@@ -52,6 +50,10 @@ public class MapReduce {
 		Job wordCountJob = Job.getInstance(conf, "wordCount");
 		FileInputFormat.addInputPath(wordCountJob, new Path(inputPath));
 		FileOutputFormat.setOutputPath(wordCountJob, new Path(outputPath));
+		
+		// set common partition properties
+		wordCountJob.setPartitionerClass(WordCount.WordCountPartitioner.class);
+		wordCountJob.setNumReduceTasks(Utils.COUNTRIES.length);
 		
 		// set common processing properties
 		wordCountJob.setJarByClass(WordCount.class);
@@ -71,7 +73,7 @@ public class MapReduce {
 		
 		// set common output properties
 		wordCountJob.setOutputKeyClass(Text.class);
-		wordCountJob.setOutputValueClass(WordCountTracker.class);
+		wordCountJob.setOutputValueClass(IntWritable.class);
 		
 		// run the job!
 		int completionCode = wordCountJob.waitForCompletion(true) ? 0 : 1;
