@@ -20,6 +20,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.hadoop.mapreduce.Mapper.Context;
@@ -84,9 +85,11 @@ public class Utils {
 	/**
 	 * 
 	 * @param code
+	 * @param startTime
+	 * @param finishTime
 	 * @param outputPath
 	 */
-	public static void printResultsToTerminal(int code, String outputPath) {
+	public static void printResultsToTerminal(int code, Date startTime, Date finishTime, String outputPath) {
 		System.out.println("\n===========================================================================");
 		System.out.println("\tJob " + ((code == 0) ? "complete " : "failed")
 				+ "! Check log for detailed execution output.");
@@ -133,6 +136,11 @@ public class Utils {
 				}
 			}
 		}
+		
+		long diffMillisec = finishTime.getTime() - startTime.getTime();
+        double diffSec = (double)diffMillisec / 1000.0;
+		System.out.println("Time to Complete (sec):\t" + diffSec);
+		System.out.println("===========================================================================");
 	}
 	
 	/**
