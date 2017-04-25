@@ -20,7 +20,8 @@ The program requires an active installation of Java and Hadoop on the target mac
 	> [Hadoop install dir] jar CIS5590_MapReduce_Lehman.jar [optional: [processing type] [input dir] [output dir]]
 
 Example:
-	> /usr/local/hadoop/bin/hadoop jar CIS5590_MapReduce_Lehman.jar
+	> /usr/local/hadoop/bin/hadoop jar CIS5590_MapReduce_Lehman.jar (local file system)
+	> /home/ubuntu/hadoop/bin/hadoop jar CIS5590_MapReduce_Lehman.jar (HDFS)
 
 If no arguments are provided for processing type, input directory, or output directory, the following default values will be used:
 	- processing type:  basic (searching for words "economy", "education", "government", "sports")
