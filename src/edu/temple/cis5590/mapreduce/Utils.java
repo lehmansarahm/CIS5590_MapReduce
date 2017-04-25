@@ -13,16 +13,18 @@
 package edu.temple.cis5590.mapreduce;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FSDataOutputStream;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
@@ -34,52 +36,17 @@ public class Utils {
 
 	/**
 	 * 
-	 * @param dirName
+	 * @param conf
+	 * @param outputPath
 	 * @param retainOrigDir
 	 */
-	public static void resetDirectory(String dirName, boolean retainOrigDir) {
-		File folder = new File(dirName);
-		if (folder.exists() && folder.isDirectory()) {
-			String[] files = folder.list();
-			for (String file: files) {
-				File currentFile = new File(folder.getPath(), file);
-				currentFile.delete();
-			}
-			if (!retainOrigDir) folder.delete();
-		} else if (retainOrigDir) folder.mkdir();
-	}
-	
-	/**
-	 * 
-	 * @param inputDirName
-	 * @param outputDirName
-	 * @throws FileNotFoundException 
-	 */
-	public static void parseInputFiles(String inputDirName, String outputDirName) throws IOException {
-		File outFolder = new File(outputDirName);
-		if (!outFolder.exists()) outFolder.mkdir();
-		
-		int counter = 0;
-		File inFolder = new File(inputDirName);
-		if (inFolder.exists() && inFolder.isDirectory()) {
-			String[] files = inFolder.list();
-			for (String file: files) {
-				// retrieve original input file
-				File currentFile = new File(inFolder.getPath(), file);
-				String fileName = currentFile.getName();
-				String country = fileName.substring(0, fileName.indexOf("."));
-				
-				// parse original input file
-				List<String> fileChunks = readFile(currentFile);
-				for (String fileChunk : fileChunks) {
-					// write new intermediate file
-		        	String newFileName = country + "." + counter + ".txt";
-		            File newFile = new File(outFolder.getPath(), newFileName);
-		            writeToFile(newFile, fileChunk);
-		            counter++;
-				}
-			}
-		} else Logger.error("CANNOT PARSE INPUT FILES FROM DIRECTORY: " + inputDirName);
+	public static void resetDirectory(Configuration conf, String outputPath, boolean retainOrigDir) {
+		try {
+			FileSystem fs = FileSystem.get(conf);
+			Path outputFolder = new Path(outputPath);
+		    if (fs.exists(outputFolder)) fs.delete(outputFolder, true);
+		    if (retainOrigDir) fs.mkdirs(outputFolder);
+		} catch (IOException ex) { /* do something */ }
 	}
 	
 	/**
@@ -87,55 +54,62 @@ public class Utils {
 	 * @param code
 	 * @param startTime
 	 * @param finishTime
+	 * @param conf
 	 * @param outputPath
 	 */
-	public static void printResultsToTerminal(int code, Date startTime, Date finishTime, String outputPath) {
+	public static void printResultsToTerminal(int code, Date startTime, Date finishTime, Configuration conf, String outputPath) {
 		System.out.println("\n===========================================================================");
 		System.out.println("\tJob " + ((code == 0) ? "complete " : "failed")
 				+ "! Check log for detailed execution output.");
 		System.out.println("===========================================================================");
 		//System.out.println("\nFinal Partition Outputs Go Here\n");
 
-		File outputFolder = new File(outputPath);
-		if (outputFolder.exists() && outputFolder.isDirectory()) {
-			String[] files = outputFolder.list();
-			for (String filename: files) {
-				// make sure we're only grabbing the partition and rank comparison output files
-				boolean isPartitionFile = filename.contains("part");
-				boolean isRankMatchFile = filename.contains("rank");
-				if (isPartitionFile || isRankMatchFile) {
-					File currentFile = new File(outputFolder.getPath(), filename);
-		            try {
-		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
-		                boolean contentWritten = false;
-		                
-		                String line;
-		                String prevCountry = "";
-		                while ((line = br.readLine()) != null) {
-		                	// filter out unicode fluff
-		                	if (!line.startsWith("crc")) {
-		                		String[] countryTokenCount = line.split("-");
-		                		String currentCountry = countryTokenCount[0].trim();
-		                		if (!isRankMatchFile && !currentCountry.equals(prevCountry)) {
+		try {
+			FileSystem fs = FileSystem.get(conf);
+			Path outputFolder = new Path(outputPath);
+			if (fs.exists(outputFolder) && fs.isDirectory(outputFolder)) {
+				RemoteIterator<LocatedFileStatus> fileIterator = fs.listFiles(outputFolder, true);
+				while(fileIterator.hasNext()){
+			        LocatedFileStatus fileStatus = fileIterator.next();
+			        if (fileStatus.isFile()) {
+						// make sure we're only grabbing the partition and rank comparison output files
+			        	String filename = fileStatus.getPath().getName();
+						boolean isPartitionFile = filename.contains("part");
+						boolean isRankMatchFile = filename.contains("rank");
+						if (isPartitionFile || isRankMatchFile) {
+				            try {
+				                BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(fileStatus.getPath())));
+				                boolean contentWritten = false;
+				                
+				                String line;
+				                String prevCountry = "";
+				                while ((line = br.readLine()) != null) {
+				                	// filter out unicode fluff
+				                	if (!line.startsWith("crc")) {
+				                		String[] countryTokenCount = line.split("-");
+				                		String currentCountry = countryTokenCount[0].trim();
+				                		if (!isRankMatchFile && !currentCountry.equals(prevCountry)) {
+						                	System.out.println("===========================================================================");
+						                	prevCountry = currentCountry;
+				                		}
+					                    System.out.println(line);
+					                    contentWritten = true;
+				                	}
+				                }
+				                
+				                if (contentWritten) {
 				                	System.out.println("===========================================================================");
-				                	prevCountry = currentCountry;
-		                		}
-			                    System.out.println(line);
-			                    contentWritten = true;
-		                	}
-		                }
-		                
-		                if (contentWritten) {
-		                	System.out.println("===========================================================================");
-		                }
-		                br.close();
-		            } catch (IOException e) {
-		                Logger.info("Could not read file: " + e.toString());
-		                Logger.error("File read failed: " + e.toString());
-		            }
+				                }
+				                br.close();
+				            } catch (IOException e) {
+				                Logger.info("Could not read file: " + e.toString());
+				                Logger.error("File read failed: " + e.toString());
+				            }
+						}
+			        }
 				}
 			}
-		}
+		} catch (IOException ex) { /* do something */ }
 		
 		long diffMillisec = finishTime.getTime() - startTime.getTime();
         double diffSec = (double)diffMillisec / 1000.0;
@@ -166,13 +140,16 @@ public class Utils {
 	
 	/**
 	 * 
-	 * @param file
+	 * @param fileName
 	 * @return
 	 */
-	public static List<String> readFile(File file) {
+	public static List<String> readFile(Configuration conf, String fileName) {
 		List<String> out = new ArrayList<String>();
 		try {
-			BufferedReader br = new BufferedReader(new FileReader(file));
+			FileSystem fs = FileSystem.get(conf);
+			Path file = new Path(fileName);
+
+            BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(file)));
 			int counter = 0;
 	        String line, chunk = "";
 	        while((line=br.readLine()) != null){
@@ -192,18 +169,29 @@ public class Utils {
 	
 	/**
 	 * 
-	 * @param entry
+	 * @param conf
+	 * @param fileName
+	 * @param fileContents
 	 */
-	public static void writeToFile(File file, String fileContents) {
+	public static void writeToFile(Configuration conf, String fileName, String fileContents) {
+		Path file = new Path(fileName);
+		writeToFile(conf, file, fileContents);
+	}
+	
+	/**
+	 * 
+	 * @param conf
+	 * @param file
+	 * @param fileContents
+	 */
+	public static void writeToFile(Configuration conf, Path file, String fileContents) {
         try {
-            if (!file.exists()) file.createNewFile();
-            FileOutputStream fos = new FileOutputStream(file);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            osw.append(fileContents);
-
-            osw.close();
-            fos.flush();
-            fos.close();
+			FileSystem fs = FileSystem.get(conf);
+            if (!fs.exists(file)) fs.create(file);
+		    
+		    FSDataOutputStream fout = fs.create(file);
+		    fout.writeUTF(fileContents);
+		    fout.close();
         } catch (IOException e) {
             System.out.println("File write failed: " + e.toString());
         }

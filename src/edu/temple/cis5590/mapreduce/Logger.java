@@ -12,9 +12,10 @@
 
 package edu.temple.cis5590.mapreduce;
 
-import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import org.apache.hadoop.conf.Configuration;
 
 /**
  * 
@@ -26,7 +27,7 @@ public class Logger {
 	private static final String DATE_ENTRY_FORMAT = "yyyy.MM.dd.HH.mm.ss";
 	
 	private static String logContents = "";
-	private static File log = new File(DEFAULT_LOGS_PATH + "/log.csv");
+	private static String logFilename = (DEFAULT_LOGS_PATH + "/log.csv");
 	
 	/**
 	 * 
@@ -58,8 +59,8 @@ public class Logger {
 	/**
 	 * 
 	 */
-	public static void writeResultsToLog() {
-		Utils.writeToFile(log, logContents);
+	public static void writeResultsToLog(Configuration conf) {
+		Utils.writeToFile(conf, logFilename, logContents);
 	}
 	
 	/**

@@ -13,13 +13,16 @@
 package edu.temple.cis5590.mapreduce;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
+import org.apache.hadoop.fs.LocatedFileStatus;
+import org.apache.hadoop.fs.Path;
+import org.apache.hadoop.fs.RemoteIterator;
 
 public class CountryTokenRank {
 	
@@ -77,7 +80,7 @@ public class CountryTokenRank {
 		}
 	}
 	
-	public void writeMatchesToFile(File outputFile) {
+	public void writeMatchesToFile(Configuration conf, Path outputFile) {
 		String output = "\n" + countryName.toUpperCase() + " RANK MATCHES:\n\t";
 		if (matchingCountries.size() == 0) output += "NONE";
 		else {
@@ -89,74 +92,86 @@ public class CountryTokenRank {
 			}
 		}
 		
-        try {
-            if (!outputFile.exists()) outputFile.createNewFile();
-            FileOutputStream fos = new FileOutputStream(outputFile, true);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            osw.append(output);
-
-            osw.close();
-            fos.flush();
-            fos.close();
-        } catch (IOException e) {
-            System.out.println("File write failed: " + e.toString());
-        }
+        Utils.writeToFile(conf, outputFile, output);
 	}
 
 	/**
 	 * 
+	 * @param conf
 	 * @param outputPath
+	 * @param rankLimit
 	 */
-	public static void compareResults(String outputPath, int rankLimit) {
-		File outputFolder = new File(outputPath);
+	public static List<String> compareResults(Configuration conf, String outputPath, int rankLimit) {
 		List<CountryTokenRank> ctrList = new ArrayList<CountryTokenRank>();
-		File rankMatchOutputFile = new File(outputFolder.getPath(), "rankMatch");
-		
-		if (outputFolder.exists() && outputFolder.isDirectory()) {
-			String[] files = outputFolder.list();
-			for (String filename: files) {
-				if (filename.contains("part")) {	// make sure we're only grabbing the partition output files
-					File currentFile = new File(outputFolder.getPath(), filename);
-		            try {
-		                BufferedReader br = new BufferedReader(new FileReader(currentFile));
-						CountryTokenRank ctr = new CountryTokenRank(rankLimit);
-						boolean contentWritten = false;
-						String prevCountry = "";
-		                String line;
-		                while ((line = br.readLine()) != null) {
-		                	// filter out unicode fluff
-		                	if (!line.startsWith("crc")) {
-		                		String[] countryTokenCount = line.split("-");
-		                		String currentCountry = countryTokenCount[0].trim();
-		                		
-		                		if (!currentCountry.equals(prevCountry)) {
-		    		                if (contentWritten) ctrList.add(ctr);
-		                			ctr = new CountryTokenRank(rankLimit);
-		                			Logger.info("New country to rank: " + currentCountry);
-		                			prevCountry = currentCountry;
-		                		}
-		                		
-			                    ctr.parseToken(line);
-			                    contentWritten = true;
-		                	}
-		                }
-		                if (contentWritten) ctrList.add(ctr);
-		                br.close();
-		            } catch (IOException e) {
-		                Logger.info("Could not read file: " + e.toString());
-		                Logger.error("File read failed: " + e.toString());
-		            }
+		try {
+			FileSystem fs = FileSystem.get(conf);
+			Path outputFolder = new Path(outputPath);
+			if (fs.exists(outputFolder) && fs.isDirectory(outputFolder)) {
+				RemoteIterator<LocatedFileStatus> fileIterator = fs.listFiles(outputFolder, true);
+				while(fileIterator.hasNext()){
+			        LocatedFileStatus fileStatus = fileIterator.next();
+			        if (fileStatus.isFile()) {
+						// make sure we're only grabbing the partition and rank comparison output files
+			        	String filename = fileStatus.getPath().getName();
+						boolean isPartitionFile = filename.contains("part");
+						if (isPartitionFile) {
+				            try {
+				                BufferedReader br = new BufferedReader(new InputStreamReader(fs.open(fileStatus.getPath())));
+								CountryTokenRank ctr = new CountryTokenRank(rankLimit);
+								boolean contentWritten = false;
+								String prevCountry = "";
+				                String line;
+				                while ((line = br.readLine()) != null) {
+				                	// filter out unicode fluff
+				                	if (!line.startsWith("crc")) {
+				                		String[] countryTokenCount = line.split("-");
+				                		String currentCountry = countryTokenCount[0].trim();
+				                		
+				                		if (!currentCountry.equals(prevCountry)) {
+				    		                if (contentWritten) ctrList.add(ctr);
+				                			ctr = new CountryTokenRank(rankLimit);
+				                			Logger.info("New country to rank: " + currentCountry);
+				                			prevCountry = currentCountry;
+				                		}
+				                		
+					                    ctr.parseToken(line);
+					                    contentWritten = true;
+				                	}
+				                }
+				                if (contentWritten) ctrList.add(ctr);
+				                br.close();
+				            } catch (IOException e) {
+				                Logger.info("Could not read file: " + e.toString());
+				                Logger.error("File read failed: " + e.toString());
+				            }
+						}
+			        }
 				}
 			}
-		}
+		} catch (IOException ex) { /* do something */ }
 		
+		List<String> out = new ArrayList<>();
 		for (int i = 0; i < ctrList.size(); i++) {
 			CountryTokenRank ctr = ctrList.get(i);
 			for (int j = 0; j < ctrList.size(); j++) {
 				if (i != j) ctr.compare(ctrList.get(j)); 
 			}
-			ctr.writeMatchesToFile(rankMatchOutputFile);
+			
+			String output = ctr.getCountryName().toUpperCase() + " RANK MATCHES:\n\t";
+			List<String> ctrMatches = ctr.getMatchingCountries();
+			if (ctrMatches.size() == 0) output += "NONE";
+			else {
+				for (int j = 0; j < ctrMatches.size(); j++) {
+					output += (ctrMatches.get(j));
+					if (j < (ctrMatches.size() - 1)) {
+						output += ", ";
+					}
+				}
+			}
+			out.add(output);
 		}
+		
+		return out;
 	}
 
 }

@@ -13,6 +13,7 @@
 package edu.temple.cis5590.mapreduce;
 
 import java.util.Date;
+import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
@@ -42,22 +43,25 @@ public class MapReduce {
 		String outputPath = (args.length >= 3) ? args[2] : DEFAULT_OUTPUT_PATH;
 		String logsPath = (args.length >= 4) ? args[3] : Logger.DEFAULT_LOGS_PATH;
 		
-		// if intermediate, output, and log folders already exist, delete 
-		// them and all of their contents so we can do a fresh write
-		Utils.resetDirectory(outputPath, false);
-		Utils.resetDirectory(logsPath, true);
-		
 		// instantiate the job
 		Date startTime = new Date();
 		Configuration conf = new Configuration();
+		conf.addResource(new Path("$HADOOP_CONF/core-site.xml"));
+		conf.addResource(new Path("$HADOOP_CONF/hdfs-site.xml"));
 		Job wordCountJob = Job.getInstance(conf, "wordCount");
-		FileInputFormat.addInputPath(wordCountJob, new Path(inputPath));
-		FileOutputFormat.setOutputPath(wordCountJob, new Path(outputPath));
+		System.setProperty("HADOOP_USER_NAME", "ubuntu");
+		
+		// if intermediate, output, and log folders already exist, delete 
+		// them and all of their contents so we can do a fresh write
+		Utils.resetDirectory(conf, outputPath, false);
+		Utils.resetDirectory(conf, logsPath, true);
 		
 		// set common processing properties
 		wordCountJob.setJarByClass(WordCount.class);
 	    wordCountJob.setMapperClass(WordCount.WordCountMapper.class);
 		wordCountJob.setReducerClass(WordCount.WordCountReducer.class);
+		FileInputFormat.addInputPath(wordCountJob, new Path(inputPath));
+		FileOutputFormat.setOutputPath(wordCountJob, new Path(outputPath));
 		
 		// set the processing-type-specific properties
 		switch (processingType.toLowerCase()) {
@@ -80,11 +84,13 @@ public class MapReduce {
 		Date finishTime = new Date();
 		
 		// print results and finish up
-		Logger.writeResultsToLog();
+		// Logger.writeResultsToLog(conf);
+		Utils.printResultsToTerminal(completionCode, startTime, finishTime, conf, outputPath);
 		if (!processingType.toLowerCase().equals("popular")) {
-			CountryTokenRank.compareResults(outputPath, WordCount.TARGET_WORDS.length);
+			List<String> matches = CountryTokenRank.compareResults(conf, outputPath, WordCount.TARGET_WORDS.length);
+			for (String match : matches) System.out.println(match);
+			System.out.println("===========================================================================");
 		}
-		Utils.printResultsToTerminal(completionCode, startTime, finishTime, outputPath);
 		System.exit(completionCode);
 	}
 	

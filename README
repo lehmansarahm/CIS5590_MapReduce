@@ -32,7 +32,7 @@ NOTE THAT EXECUTION PARAMETERS MUST BE INCLUDED IN DESIGNATED ORDER.  All three 
 		
 PROGRAM OUTPUT
 -----------------------------
-The "base" execution mode will generate two output files - a partition file, and a "rank match" file.  The partition file contains the counts of each target word ("economy", "education", "government", and "sports) for each country, ranked in descending order by count value.  The "rank match" file contains the comparison of countries whose target word rankings match those of other countries.  The "popular" execution mode will generate a single partition file, containing the three most popular words per country and their associated count values.
+For each processing type, an output partition file will be written to the output directory of the user's choice.  It will contain the word selections and associated instance counts for each country, ranked in descending order of occurrence frequency.  If the user has indicated a "base" (or "target word") processing type, the program will also identify and output those countries which have the same order of word rankings.  (NOTE: this data is not written to a file, and will need to be saved manually by the user if a copy is to be kept.)
 
 Regardless of processing type, the program will output the total execution time and contents of the generated output files to the terminal for user review.  The final output may be written to its own file rather than the terminal if the user chooses.
 
