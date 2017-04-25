@@ -32,7 +32,9 @@ NOTE THAT EXECUTION PARAMETERS MUST BE INCLUDED IN DESIGNATED ORDER.  All three 
 		
 PROGRAM OUTPUT
 -----------------------------
-For each processing type, an output partition file will be written to the output directory of the user's choice.  It will contain the word selections and associated instance counts for each country, ranked in descending order of occurrence frequency.  If the user has indicated a "base" (or "target word") processing type, the program will also identify and output those countries which have the same order of word rankings.  (NOTE: this data is not written to a file, and will need to be saved manually by the user if a copy is to be kept.)
+For each processing type, an output partition file will be written to the output directory of the user's choice.  It will contain the word selections and associated instance counts for each country, ranked in descending order of occurrence frequency.  For the user's convenience, this data will also be displayed in the console after a successful job completion.
+
+If the user has indicated a "base" (or "target word") processing type, the program will also identify and output those countries which have the same order of word rankings.  (NOTE: this data is not written to a file, and will need to be saved manually by the user if a copy is to be kept.)
 
 Regardless of processing type, the program will output the total execution time and contents of the generated output files to the terminal for user review.  The final output may be written to its own file rather than the terminal if the user chooses.
 
@@ -52,4 +54,6 @@ This program was tested locally using a virtual machine with the following speci
 		- 2.7 GHz Intel i5 CPU
 
 This program was tested remotely using AWS EC2 instances with the following specifications:
-	- Etc.
+	- Instance type:  T2 micro
+	- Base AMI:  Ubuntu v. 16.04
+	- Root device type:  EBS (default)
