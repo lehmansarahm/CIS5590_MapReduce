@@ -32,6 +32,15 @@ RUNNING THE PROGRAM
 	- NOTE THAT EXECUTION PARAMETERS MUST BE INCLUDED IN DESIGNATED ORDER
 		- All three arguments may be omitted, but if a given argument is included, all preceding arguments must also be included
 		- i.e. processing type may be included without any other arguments, but output directory may not be included without also including processing type and input directory
+		
+PROGRAM OUTPUT
+-----------------------------
+	- The "base" execution mode will generate two output files - a partition file, and a "rank match" file.
+		- The partition file contains the counts of each target word ("economy", "education", "government", and "sports) for each country, ranked in descending order by count value.
+		- The "rank match" file contains the comparison of countries whose target word rankings match those of other countries.
+	- The "popular" execution mode will generate a single partition file, containing the three most popular words per country and their associated count values.
+	- Regardless of processing type, the program will output the total execution time and contents of the generated output files to the terminal for user review.
+		- The final output may be written to its own file rather than the terminal if the user chooses.
 
 VERIFIED ENVIRONMENTS
 -----------------------------
