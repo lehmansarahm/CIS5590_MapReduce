@@ -39,6 +39,8 @@ If the user has indicated a "base" (or "target word") processing type, the progr
 
 Regardless of processing type, the program will output the total execution time and contents of the generated output files to the terminal for user review.  The final output may be written to its own file rather than the terminal if the user chooses.
 
+** Examples of program output may be found in the "references" directory under the project root **
+
 VERIFIED ENVIRONMENTS
 -----------------------------
 This program was verified on a system with the following specifications:
