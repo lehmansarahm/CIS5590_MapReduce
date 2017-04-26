@@ -1,0 +1,427 @@
+Welcome to Ubuntu 16.04.2 LTS (GNU/Linux 4.4.0-64-generic x86_64)
+
+ * Documentation:  https://help.ubuntu.com
+ * Management:     https://landscape.canonical.com
+ * Support:        https://ubuntu.com/advantage
+
+  Get cloud support with Ubuntu Advantage Cloud Guest:
+    http://www.ubuntu.com/business/services/cloud
+
+30 packages can be updated.
+0 updates are security updates.
+
+
+*** System restart required ***
+Last login: Tue Apr 25 21:21:48 2017 from 100.11.55.87
+ubuntu@ip-172-31-15-131:~$ cd mapreduce/
+ubuntu@ip-172-31-15-131:~/mapreduce$ /usr/local/hadoop/bin/hadoop jar CIS5590_MapReduce_Lehman.jar popular
+17/04/25 21:22:55 INFO Configuration.deprecation: session.id is deprecated. Instead, use dfs.metrics.session-id
+17/04/25 21:22:55 INFO jvm.JvmMetrics: Initializing JVM Metrics with processName=JobTracker, sessionId=
+17/04/25 21:22:56 WARN mapreduce.JobResourceUploader: Hadoop command-line option parsing not performed. Implement the Tool interface and execute your application with ToolRunner to remedy this.
+17/04/25 21:22:56 INFO input.FileInputFormat: Total input files to process : 10
+17/04/25 21:22:56 INFO mapreduce.JobSubmitter: number of splits:10
+17/04/25 21:22:56 INFO mapreduce.JobSubmitter: Submitting tokens for job: job_local212641149_0001
+17/04/25 21:22:56 INFO mapreduce.Job: The url to track the job: http://localhost:8080/
+17/04/25 21:22:56 INFO mapreduce.Job: Running job: job_local212641149_0001
+17/04/25 21:22:56 INFO mapred.LocalJobRunner: OutputCommitter set in config null
+17/04/25 21:22:56 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:56 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:56 INFO mapred.LocalJobRunner: OutputCommitter is org.apache.hadoop.mapreduce.lib.output.FileOutputCommitter
+17/04/25 21:22:56 INFO mapred.LocalJobRunner: Waiting for map tasks
+17/04/25 21:22:56 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000000_0
+17/04/25 21:22:56 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:56 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:56 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:56 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/UnitedStates.txt:0+250567
+17/04/25 21:22:56 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:56 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:56 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:56 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:56 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:56 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:57 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:57 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufend = 98313; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26198388(104793552); length = 16009/6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:57 INFO mapred.Task: Task:attempt_local212641149_0001_m_000000_0 is done. And is in the process of committing
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:57 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000000_0' done.
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000000_0
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000001_0
+17/04/25 21:22:57 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:57 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:57 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:57 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/UnitedKingdom.txt:0+218770
+17/04/25 21:22:57 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:57 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:57 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:57 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:57 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufend = 86722; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26200808(104803232); length = 13589/6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:57 INFO mapred.Task: Task:attempt_local212641149_0001_m_000001_0 is done. And is in the process of committing
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:57 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000001_0' done.
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000001_0
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000002_0
+17/04/25 21:22:57 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:57 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:57 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:57 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/France.txt:0+200348
+17/04/25 21:22:57 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:57 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:57 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:57 INFO mapreduce.Job: Job job_local212641149_0001 running in uber mode : false
+17/04/25 21:22:57 INFO mapreduce.Job:  map 100% reduce 0%
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:57 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:57 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufend = 55311; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26201864(104807456); length = 12533/6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:57 INFO mapred.Task: Task:attempt_local212641149_0001_m_000002_0 is done. And is in the process of committing
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:57 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000002_0' done.
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000002_0
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000003_0
+17/04/25 21:22:57 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:57 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:57 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:57 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/Sweden.txt:0+176638
+17/04/25 21:22:57 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:57 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:57 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:57 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:57 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufend = 42374; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26204684(104818736); length = 9713/6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:57 INFO mapred.Task: Task:attempt_local212641149_0001_m_000003_0 is done. And is in the process of committing
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:57 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000003_0' done.
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000003_0
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000004_0
+17/04/25 21:22:57 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:57 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:57 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:57 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/Norway.txt:0+157044
+17/04/25 21:22:57 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:57 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:57 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:57 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:57 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:57 INFO mapred.MapTask: bufstart = 0; bufend = 45276; bufvoid = 104857600
+17/04/25 21:22:57 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26204212(104816848); length = 10185/6553600
+17/04/25 21:22:57 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:57 INFO mapred.Task: Task:attempt_local212641149_0001_m_000004_0 is done. And is in the process of committing
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:57 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000004_0' done.
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000004_0
+17/04/25 21:22:57 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000005_0
+17/04/25 21:22:57 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:57 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:57 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:57 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/Finland.txt:0+139145
+17/04/25 21:22:58 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:58 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:58 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:58 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:58 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufend = 42507; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26205340(104821360); length = 9057/6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:58 INFO mapred.Task: Task:attempt_local212641149_0001_m_000005_0 is done. And is in the process of committing
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:58 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000005_0' done.
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000005_0
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000006_0
+17/04/25 21:22:58 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:58 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:58 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:58 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/Switzerland.txt:0+130940
+17/04/25 21:22:58 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:58 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:58 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:58 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:58 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufend = 46382; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26206288(104825152); length = 8109/6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:58 INFO mapred.Task: Task:attempt_local212641149_0001_m_000006_0 is done. And is in the process of committing
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:58 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000006_0' done.
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000006_0
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000007_0
+17/04/25 21:22:58 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:58 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:58 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:58 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/Denmark.txt:0+123646
+17/04/25 21:22:58 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:58 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:58 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:58 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:58 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufend = 34328; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26207048(104828192); length = 7349/6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:58 INFO mapred.Task: Task:attempt_local212641149_0001_m_000007_0 is done. And is in the process of committing
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:58 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000007_0' done.
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000007_0
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000008_0
+17/04/25 21:22:58 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:58 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:58 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:58 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/Ireland.txt:0+113511
+17/04/25 21:22:58 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:58 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:58 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:58 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:58 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufend = 33392; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26207144(104828576); length = 7253/6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:58 INFO mapred.Task: Task:attempt_local212641149_0001_m_000008_0 is done. And is in the process of committing
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:58 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000008_0' done.
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000008_0
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_m_000009_0
+17/04/25 21:22:58 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:58 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:58 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:58 INFO mapred.MapTask: Processing split: file:/home/ubuntu/mapreduce/input/Netherlands.txt:0+55222
+17/04/25 21:22:58 INFO mapred.MapTask: (EQUATOR) 0 kvi 26214396(104857584)
+17/04/25 21:22:58 INFO mapred.MapTask: mapreduce.task.io.sort.mb: 100
+17/04/25 21:22:58 INFO mapred.MapTask: soft limit at 83886080
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396; length = 6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Map output collector class = org.apache.hadoop.mapred.MapTask$MapOutputBuffer
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: 
+17/04/25 21:22:58 INFO mapred.MapTask: Starting flush of map output
+17/04/25 21:22:58 INFO mapred.MapTask: Spilling map output
+17/04/25 21:22:58 INFO mapred.MapTask: bufstart = 0; bufend = 19536; bufvoid = 104857600
+17/04/25 21:22:58 INFO mapred.MapTask: kvstart = 26214396(104857584); kvend = 26211048(104844192); length = 3349/6553600
+17/04/25 21:22:58 INFO mapred.MapTask: Finished spill 0
+17/04/25 21:22:58 INFO mapred.Task: Task:attempt_local212641149_0001_m_000009_0 is done. And is in the process of committing
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: map
+17/04/25 21:22:58 INFO mapred.Task: Task 'attempt_local212641149_0001_m_000009_0' done.
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_m_000009_0
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: map task executor complete.
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Waiting for reduce tasks
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: Starting task: attempt_local212641149_0001_r_000000_0
+17/04/25 21:22:58 INFO output.FileOutputCommitter: File Output Committer Algorithm version is 1
+17/04/25 21:22:58 INFO output.FileOutputCommitter: FileOutputCommitter skip cleanup _temporary folders under output directory:false, ignore cleanup failures: false
+17/04/25 21:22:58 INFO mapred.Task:  Using ResourceCalculatorProcessTree : [ ]
+17/04/25 21:22:58 INFO mapred.ReduceTask: Using ShuffleConsumerPlugin: org.apache.hadoop.mapreduce.task.reduce.Shuffle@4094abfc
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: MergerManager: memoryLimit=363285696, maxSingleShuffleLimit=90821424, mergeThreshold=239768576, ioSortFactor=10, memToMemMergeOutputsThreshold=10
+17/04/25 21:22:58 INFO reduce.EventFetcher: attempt_local212641149_0001_r_000000_0 Thread started: EventFetcher for fetching Map Completion Events
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000007_0 decomp: 38006 len: 38010 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 38006 bytes from map-output for attempt_local212641149_0001_m_000007_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 38006, inMemoryMapOutputs.size() -> 1, commitMemory -> 0, usedMemory ->38006
+17/04/25 21:22:58 WARN io.ReadaheadPool: Failed readahead on ifile
+EBADF: Bad file descriptor
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posix_fadvise(Native Method)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posixFadviseIfPossible(NativeIO.java:267)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX$CacheManipulator.posixFadviseIfPossible(NativeIO.java:146)
+	at org.apache.hadoop.io.ReadaheadPool$ReadaheadRequestImpl.run(ReadaheadPool.java:208)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000004_0 decomp: 50372 len: 50376 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 50372 bytes from map-output for attempt_local212641149_0001_m_000004_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 50372, inMemoryMapOutputs.size() -> 2, commitMemory -> 38006, usedMemory ->88378
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000001_0 decomp: 93520 len: 93524 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 93520 bytes from map-output for attempt_local212641149_0001_m_000001_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 93520, inMemoryMapOutputs.size() -> 3, commitMemory -> 88378, usedMemory ->181898
+17/04/25 21:22:58 WARN io.ReadaheadPool: Failed readahead on ifile
+EBADF: Bad file descriptor
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posix_fadvise(Native Method)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posixFadviseIfPossible(NativeIO.java:267)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX$CacheManipulator.posixFadviseIfPossible(NativeIO.java:146)
+	at org.apache.hadoop.io.ReadaheadPool$ReadaheadRequestImpl.run(ReadaheadPool.java:208)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000008_0 decomp: 37022 len: 37026 to MEMORY
+17/04/25 21:22:58 WARN io.ReadaheadPool: Failed readahead on ifile
+EBADF: Bad file descriptor
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posix_fadvise(Native Method)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posixFadviseIfPossible(NativeIO.java:267)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX$CacheManipulator.posixFadviseIfPossible(NativeIO.java:146)
+	at org.apache.hadoop.io.ReadaheadPool$ReadaheadRequestImpl.run(ReadaheadPool.java:208)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 37022 bytes from map-output for attempt_local212641149_0001_m_000008_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 37022, inMemoryMapOutputs.size() -> 4, commitMemory -> 181898, usedMemory ->218920
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000005_0 decomp: 47039 len: 47043 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 47039 bytes from map-output for attempt_local212641149_0001_m_000005_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 47039, inMemoryMapOutputs.size() -> 5, commitMemory -> 218920, usedMemory ->265959
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000002_0 decomp: 61581 len: 61585 to MEMORY
+17/04/25 21:22:58 WARN io.ReadaheadPool: Failed readahead on ifile
+EBADF: Bad file descriptor
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posix_fadvise(Native Method)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX.posixFadviseIfPossible(NativeIO.java:267)
+	at org.apache.hadoop.io.nativeio.NativeIO$POSIX$CacheManipulator.posixFadviseIfPossible(NativeIO.java:146)
+	at org.apache.hadoop.io.ReadaheadPool$ReadaheadRequestImpl.run(ReadaheadPool.java:208)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1142)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:617)
+	at java.lang.Thread.run(Thread.java:745)
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 61581 bytes from map-output for attempt_local212641149_0001_m_000002_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 61581, inMemoryMapOutputs.size() -> 6, commitMemory -> 265959, usedMemory ->327540
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000009_0 decomp: 21214 len: 21218 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 21214 bytes from map-output for attempt_local212641149_0001_m_000009_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 21214, inMemoryMapOutputs.size() -> 7, commitMemory -> 327540, usedMemory ->348754
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000006_0 decomp: 50440 len: 50444 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 50440 bytes from map-output for attempt_local212641149_0001_m_000006_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 50440, inMemoryMapOutputs.size() -> 8, commitMemory -> 348754, usedMemory ->399194
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000003_0 decomp: 47234 len: 47238 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 47234 bytes from map-output for attempt_local212641149_0001_m_000003_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 47234, inMemoryMapOutputs.size() -> 9, commitMemory -> 399194, usedMemory ->446428
+17/04/25 21:22:58 INFO reduce.LocalFetcher: localfetcher#1 about to shuffle output of map attempt_local212641149_0001_m_000000_0 decomp: 106321 len: 106325 to MEMORY
+17/04/25 21:22:58 INFO reduce.InMemoryMapOutput: Read 106321 bytes from map-output for attempt_local212641149_0001_m_000000_0
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: closeInMemoryFile -> map-output of size: 106321, inMemoryMapOutputs.size() -> 10, commitMemory -> 446428, usedMemory ->552749
+17/04/25 21:22:58 INFO reduce.EventFetcher: EventFetcher is interrupted.. Returning
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: 10 / 10 copied.
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: finalMerge called with 10 in-memory map-outputs and 0 on-disk map-outputs
+17/04/25 21:22:58 INFO mapred.Merger: Merging 10 sorted segments
+17/04/25 21:22:58 INFO mapred.Merger: Down to the last merge-pass, with 10 segments left of total size: 552631 bytes
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: Merged 10 segments, 552749 bytes to disk to satisfy reduce memory limit
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: Merging 1 files, 552735 bytes from disk
+17/04/25 21:22:58 INFO reduce.MergeManagerImpl: Merging 0 segments, 0 bytes from memory into reduce
+17/04/25 21:22:58 INFO mapred.Merger: Merging 1 sorted segments
+17/04/25 21:22:58 INFO mapred.Merger: Down to the last merge-pass, with 1 segments left of total size: 552721 bytes
+17/04/25 21:22:58 INFO mapred.LocalJobRunner: 10 / 10 copied.
+17/04/25 21:22:58 INFO Configuration.deprecation: mapred.skip.on is deprecated. Instead, use mapreduce.job.skiprecords
+17/04/25 21:22:59 INFO mapred.Task: Task:attempt_local212641149_0001_r_000000_0 is done. And is in the process of committing
+17/04/25 21:22:59 INFO mapred.LocalJobRunner: 10 / 10 copied.
+17/04/25 21:22:59 INFO mapred.Task: Task attempt_local212641149_0001_r_000000_0 is allowed to commit now
+17/04/25 21:22:59 INFO output.FileOutputCommitter: Saved output of task 'attempt_local212641149_0001_r_000000_0' to file:/home/ubuntu/mapreduce/output/_temporary/0/task_local212641149_0001_r_000000
+17/04/25 21:22:59 INFO mapred.LocalJobRunner: reduce > reduce
+17/04/25 21:22:59 INFO mapred.Task: Task 'attempt_local212641149_0001_r_000000_0' done.
+17/04/25 21:22:59 INFO mapred.LocalJobRunner: Finishing task: attempt_local212641149_0001_r_000000_0
+17/04/25 21:22:59 INFO mapred.LocalJobRunner: reduce task executor complete.
+17/04/25 21:22:59 INFO mapreduce.Job:  map 100% reduce 100%
+17/04/25 21:22:59 INFO mapreduce.Job: Job job_local212641149_0001 completed successfully
+17/04/25 21:22:59 INFO mapreduce.Job: Counters: 30
+	File System Counters
+		FILE: Number of bytes read=71008465
+		FILE: Number of bytes written=66906649
+		FILE: Number of read operations=0
+		FILE: Number of large read operations=0
+		FILE: Number of write operations=0
+	Map-Reduce Framework
+		Map input records=13781
+		Map output records=24294
+		Map output bytes=504141
+		Map output materialized bytes=552789
+		Input split bytes=1116
+		Combine input records=0
+		Combine output records=0
+		Reduce input groups=10
+		Reduce shuffle bytes=552789
+		Reduce input records=24294
+		Reduce output records=30
+		Spilled Records=48588
+		Shuffled Maps =10
+		Failed Shuffles=0
+		Merged Map outputs=10
+		GC time elapsed (ms)=278
+		Total committed heap usage (bytes)=1660235776
+	Shuffle Errors
+		BAD_ID=0
+		CONNECTION=0
+		IO_ERROR=0
+		WRONG_LENGTH=0
+		WRONG_MAP=0
+		WRONG_REDUCE=0
+	File Input Format Counters 
+		Bytes Read=1565831
+	File Output Format Counters 
+		Bytes Written=720
+
+===========================================================================
+	Job complete ! Check log for detailed execution output.
+===========================================================================
+===========================================================================
+Denmark - denmark	470
+Denmark - danish	230
+Denmark - archived	68
+===========================================================================
+Finland - finland	381
+Finland - finnish	161
+Finland - world	81
+===========================================================================
+France - france	456
+France - french	303
+France - world	113
+===========================================================================
+Ireland - ireland	219
+Ireland - irish	178
+Ireland - republic	77
+===========================================================================
+Netherlands - netherlands	237
+Netherlands - kingdom	170
+Netherlands - dutch	53
+===========================================================================
+Norway - norway	404
+Norway - norwegian	166
+Norway - archived	82
+===========================================================================
+Sweden - sweden	499
+Sweden - swedish	366
+Sweden - archived	76
+===========================================================================
+Switzerland - switzerland	277
+Switzerland - swiss	230
+Switzerland - german	129
+===========================================================================
+United Kingdom - united	266
+United Kingdom - british	152
+United Kingdom - kingdom	151
+===========================================================================
+United States - united	451
+United States - states	287
+United States - american	114
+===========================================================================
+Time to Complete (sec):	5.276
+===========================================================================
+ubuntu@ip-172-31-15-131:~/mapreduce$ /usr/local/hadoop/bin/hadoop fs -ls output
+Found 2 items
+-rw-r--r--   1 ubuntu ubuntu          0 2017-04-25 21:22 output/_SUCCESS
+-rw-r--r--   1 ubuntu ubuntu        704 2017-04-25 21:22 output/part-r-00000
+ubuntu@ip-172-31-15-131:~/mapreduce$ 
