@@ -60,3 +60,11 @@ This program was tested remotely using AWS EC2 instances with the following spec
 	- Instance type:  T2 micro
 	- Base AMI:  Ubuntu v. 16.04
 	- Root device type:  EBS (default)
+	
+AMI's
+-----------------------------
+Public AMI's may be found on the AWS EC2 dashboard by searching for "HD-AMI-Lehman" among the community images.  The following four images are currently available:
+	- NameNode
+	- SNN (SecondaryNameNode)
+	- DataNode
+	- Standalone
