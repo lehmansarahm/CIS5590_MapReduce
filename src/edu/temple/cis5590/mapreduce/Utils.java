@@ -16,8 +16,12 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataOutputStream;
@@ -34,6 +38,11 @@ public class Utils {
 			new String[] { "Denmark", "Finland", "France", "Ireland", "Netherlands", 
 					"Norway", "Sweden", "Switzerland", "United Kingdom", "United States" };
 
+	public final static String[] TARGET_WORDS = 
+			new String[] { "economy", "education", "government", "sports" };
+	
+	public static enum WORD_COUNT_MODE { Target, Popular };
+	
 	/**
 	 * 
 	 * @param conf
@@ -136,6 +145,41 @@ public class Utils {
 		}
 		
 		return countryName;
+	}
+
+	/**
+	 * 
+	 * @param map
+	 * @param key
+	 * @param val
+	 * @return
+	 */
+	public static Map<String,Integer> insert(Map<String,Integer> map, String key, int val) {
+		if (!map.containsKey(key)) map.put(key,val);
+		if (val > 0) {
+			int oldVal = map.get(key);
+			map.put(key, (val + oldVal));
+		}
+		return map;
+	}
+
+	/**
+	 * 
+	 * @param tokenMap
+	 * @return
+	 */
+	public static List<Map.Entry<String, Integer>> rankTokenMap(Map<String,Integer> tokenMap) {
+		List<Map.Entry<String, Integer>> list =
+		        new LinkedList<Map.Entry<String, Integer>>(tokenMap.entrySet());
+		
+		Collections.sort(list, new Comparator<Map.Entry<String, Integer>>() {
+		    public int compare(Map.Entry<String, Integer> o1,
+		                       Map.Entry<String, Integer> o2) {
+		        return -1 * (o1.getValue()).compareTo(o2.getValue());
+		    }
+		});
+		
+		return list;
 	}
 	
 	/**

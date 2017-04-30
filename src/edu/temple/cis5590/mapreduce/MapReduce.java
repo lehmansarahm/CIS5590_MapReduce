@@ -16,16 +16,17 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.conf.Configured;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Job;
 import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
+import org.apache.hadoop.util.Tool;
+import org.apache.hadoop.util.ToolRunner;
 
-import edu.temple.cis5590.mapreduce.WordCount.WORD_COUNT_MODE;
-
-public class MapReduce {
+public class MapReduce extends Configured implements Tool {
 
 	private static final String DEFAULT_PROCESSING_TYPE = "base";
 	private static final String DEFAULT_INPUT_PATH = "input";
@@ -38,6 +39,14 @@ public class MapReduce {
 	 * args[2] = output path (to be overwritten if already exists)
 	 */
 	public static void main(String[] args) throws Exception {
+		int code = ToolRunner.run(new Configuration(), new MapReduce(), args);
+		System.exit(code);
+	}
+	
+	/**
+	 * 
+	 */
+	public int run(String[] args) throws Exception {
 		String processingType = (args.length >= 1) ? args[0] : DEFAULT_PROCESSING_TYPE;
 		String inputPath = (args.length >= 2) ? args[1] : DEFAULT_INPUT_PATH;
 		String outputPath = (args.length >= 3) ? args[2] : DEFAULT_OUTPUT_PATH;
@@ -45,7 +54,7 @@ public class MapReduce {
 		
 		// instantiate the job
 		Date startTime = new Date();
-		Configuration conf = new Configuration();
+		Configuration conf = this.getConf();
 		conf.addResource(new Path("$HADOOP_CONF/core-site.xml"));
 		conf.addResource(new Path("$HADOOP_CONF/hdfs-site.xml"));
 		Job wordCountJob = Job.getInstance(conf, "wordCount");
@@ -57,19 +66,19 @@ public class MapReduce {
 		Utils.resetDirectory(conf, logsPath, true);
 		
 		// set common processing properties
-		wordCountJob.setJarByClass(WordCount.class);
-	    wordCountJob.setMapperClass(WordCount.WordCountMapper.class);
-		wordCountJob.setReducerClass(WordCount.WordCountReducer.class);
+		wordCountJob.setJarByClass(WordCountMapper.class);
 		FileInputFormat.addInputPath(wordCountJob, new Path(inputPath));
 		FileOutputFormat.setOutputPath(wordCountJob, new Path(outputPath));
 		
 		// set the processing-type-specific properties
 		switch (processingType.toLowerCase()) {
 			case "popular":
-			    WordCount.setMode(WORD_COUNT_MODE.Popular);
+			    wordCountJob.setMapperClass(WordCountMapper.PopularWordCountMapper.class);
+				wordCountJob.setReducerClass(WordCountReducer.PopularWordCountReducer.class);
 				break;
 			default:
-			    WordCount.setMode(WORD_COUNT_MODE.Target);
+			    wordCountJob.setMapperClass(WordCountMapper.TargetWordCountMapper.class);
+				wordCountJob.setReducerClass(WordCountReducer.TargetWordCountReducer.class);
 				break;
 		}
 		
@@ -87,11 +96,11 @@ public class MapReduce {
 		// Logger.writeResultsToLog(conf);
 		Utils.printResultsToTerminal(completionCode, startTime, finishTime, conf, outputPath);
 		if (!processingType.toLowerCase().equals("popular")) {
-			List<String> matches = CountryTokenRank.compareResults(conf, outputPath, WordCount.TARGET_WORDS.length);
+			List<String> matches = CountryTokenRank.compareResults(conf, outputPath, Utils.TARGET_WORDS.length);
 			for (String match : matches) System.out.println(match);
 			System.out.println("===========================================================================");
 		}
-		System.exit(completionCode);
+		return completionCode;
 	}
 	
 }
