@@ -22,25 +22,27 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 
+/**
+ * General purpose word count mapper class - provides two mapping classes, 
+ * one for "target" words and one for "popular" words
+ */
 public class WordCountMapper {
 
 	// ============================================================================================
 	//										TARGET
 	// ============================================================================================
 
-	/**
-	 * 
-	 */
 	public static class TargetWordCountMapper extends Mapper<Object, Text, Text, Text> {
 
 		private Text countryText = new Text();
 		private Text tokenText = new Text();
 		
 		/**
+		 * Maps the input words according to whether they appear in a list of target words
 		 * 
-		 * @param key
-		 * @param value
-		 * @param context
+		 * @param key - the ID of the input file being mapped
+		 * @param value - the current line of text from the input file being mapped
+		 * @param context - the mapping context being used
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
@@ -75,19 +77,18 @@ public class WordCountMapper {
 	//										POPULAR
 	// ============================================================================================
 
-	/**
-	 * 
-	 */
 	public static class PopularWordCountMapper extends Mapper<Object, Text, Text, Text> {
 
 		private Text countryText = new Text();
 		private Text tokenText = new Text();
 		
 		/**
+		 * Maps the input words according to whether they are 5+ characters long and among 
+		 * the three most prevalent words in the input file
 		 * 
-		 * @param key
-		 * @param value
-		 * @param context
+		 * @param key - the ID of the input file being mapped
+		 * @param value - the current line of text from the input file being mapped
+		 * @param context - the mapping context being used
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
@@ -114,12 +115,13 @@ public class WordCountMapper {
 	// ============================================================================================
 	
 	/**
+	 * Writes provided word to context, to be shuffled and provided to reducer class
 	 * 
-	 * @param mode
-	 * @param tokens
-	 * @param countryText
-	 * @param tokenText
-	 * @param context
+	 * @param mode - processing mode (either "target" or "popular")
+	 * @param tokens - the current list of tokens already mapped
+	 * @param countryText - the name of the country for which we are mapping
+	 * @param tokenText - the text of the token currently being evaluated
+	 * @param context - the mapping context to use
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */

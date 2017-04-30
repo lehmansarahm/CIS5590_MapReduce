@@ -22,25 +22,27 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 import org.apache.hadoop.mapreduce.Reducer.Context;
 
+/**
+ * General purpose word count reducer class - provides two reducing classes, 
+ * one for "target" words and one for "popular" words
+ */
 public class WordCountReducer {
 
 	// ============================================================================================
 	//											TARGET
 	// ============================================================================================
 	
-	/**
-	 * 
-	 */
 	public static class TargetWordCountReducer extends Reducer<Text, Text, Text, IntWritable> {
 		
 		private Text tokenText = new Text();
 		private IntWritable totalCount = new IntWritable();
 		
 		/**
+		 * Reduces the input words according to whether they appear in a list of target words
 		 * 
-		 * @param key
-		 * @param values
-		 * @param context
+		 * @param key - the name of the country from which the tokens were taken
+		 * @param values - the list of "token-count" values for each country
+		 * @param context - the reducer context being used
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
@@ -63,19 +65,18 @@ public class WordCountReducer {
 	//											POPULAR
 	// ============================================================================================
 	
-	/**
-	 * 
-	 */
 	public static class PopularWordCountReducer extends Reducer<Text, Text, Text, IntWritable> {
 		
 		private Text tokenText = new Text();
 		private IntWritable totalCount = new IntWritable();
 		
 		/**
+		 * Reduces the input words according to whether they are among the three most prevalent 
+		 * words in the input file
 		 * 
-		 * @param key
-		 * @param values
-		 * @param context
+		 * @param key - the name of the country from which the tokens were taken
+		 * @param values - the list of "token-count" values for each country
+		 * @param context - the reducer context being used
 		 * @throws IOException
 		 * @throws InterruptedException
 		 */
@@ -99,9 +100,9 @@ public class WordCountReducer {
 	// ============================================================================================
 	
 	/**
-	 * 
-	 * @param values
-	 * @return
+	 * Converts a list of "token-count" values into a map of token-count values
+	 * @param values - the "token-count" strings to reduce
+	 * @return the consolidated token-count map
 	 */
 	public static Map<String,Integer> reduceTokens(Iterable<Text> values) {
 		Map<String,Integer> reducedTokens = new HashMap<String,Integer>();
@@ -113,13 +114,14 @@ public class WordCountReducer {
 	}
 	
 	/**
+	 * Writes provided word to context, to be returned as a final result
 	 * 
-	 * @param mode
-	 * @param key
-	 * @param reducedTokens
-	 * @param tokenText
-	 * @param totalCount
-	 * @param context
+	 * @param mode - processing mode (either "target" or "popular")
+	 * @param key - the name of the country for which tokens are being reduced
+	 * @param reducedTokens - the current map of tokens already reduced
+	 * @param tokenText - the token word being reduced
+	 * @param totalCount - the count of token words being reduced
+	 * @param context - the reducing context being used
 	 * @throws IOException
 	 * @throws InterruptedException
 	 */

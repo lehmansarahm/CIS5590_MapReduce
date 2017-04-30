@@ -32,6 +32,9 @@ import org.apache.hadoop.fs.RemoteIterator;
 import org.apache.hadoop.mapreduce.Mapper.Context;
 import org.apache.hadoop.mapreduce.lib.input.FileSplit;
 
+/**
+ * Public reference class with utilitarian methods for general use
+ */
 public class Utils {
 
 	public final static String[] COUNTRIES = 
@@ -44,10 +47,10 @@ public class Utils {
 	public static enum WORD_COUNT_MODE { Target, Popular };
 	
 	/**
-	 * 
-	 * @param conf
-	 * @param outputPath
-	 * @param retainOrigDir
+	 * Deletes the provided folder and any contents
+	 * @param conf - the configuration to use
+	 * @param outputPath - the folder to delete
+	 * @param retainOrigDir - if folder should be retained, recreate after delete
 	 */
 	public static void resetDirectory(Configuration conf, String outputPath, boolean retainOrigDir) {
 		try {
@@ -59,12 +62,13 @@ public class Utils {
 	}
 	
 	/**
+	 * Dumps final execution results to terminal
 	 * 
-	 * @param code
-	 * @param startTime
-	 * @param finishTime
-	 * @param conf
-	 * @param outputPath
+	 * @param code - execution result code from mapreduce job
+	 * @param startTime - the time the job started
+	 * @param finishTime - the time the job finished
+	 * @param conf - the configuration to use
+	 * @param outputPath - folder of output files to analyze
 	 */
 	public static void printResultsToTerminal(int code, Date startTime, Date finishTime, Configuration conf, String outputPath) {
 		System.out.println("\n===========================================================================");
@@ -127,9 +131,9 @@ public class Utils {
 	}
 	
 	/**
-	 * 
-	 * @param context
-	 * @return
+	 * Returns the associated country name for the current mapping context
+	 * @param context - the context to use
+	 * @return the country name for the current input file
 	 */
 	@SuppressWarnings("rawtypes")
 	public static String getCountryName(Context context) {
@@ -148,11 +152,11 @@ public class Utils {
 	}
 
 	/**
-	 * 
-	 * @param map
-	 * @param key
-	 * @param val
-	 * @return
+	 * Inserts a key into a provided map
+	 * @param map - the map to insert into
+	 * @param key - the key to use
+	 * @param val - the value to use
+	 * @return the updated map
 	 */
 	public static Map<String,Integer> insert(Map<String,Integer> map, String key, int val) {
 		if (!map.containsKey(key)) map.put(key,val);
@@ -164,9 +168,9 @@ public class Utils {
 	}
 
 	/**
-	 * 
-	 * @param tokenMap
-	 * @return
+	 * Sorts and ranks the contents of a token map
+	 * @param tokenMap - the map to sort and rank
+	 * @return the updated map
 	 */
 	public static List<Map.Entry<String, Integer>> rankTokenMap(Map<String,Integer> tokenMap) {
 		List<Map.Entry<String, Integer>> list =
@@ -183,9 +187,10 @@ public class Utils {
 	}
 	
 	/**
-	 * 
-	 * @param fileName
-	 * @return
+	 * Reads the contents of the indicated file and returns a string list
+	 * @param conf - the configuration to use
+	 * @param fileName - the file to read from
+	 * @return a String list of the file contents
 	 */
 	public static List<String> readFile(Configuration conf, String fileName) {
 		List<String> out = new ArrayList<String>();
@@ -212,21 +217,21 @@ public class Utils {
 	}
 	
 	/**
-	 * 
-	 * @param conf
-	 * @param fileName
-	 * @param fileContents
+	 * Dumps the provided text to a file
+	 * @param conf - the configuration to use
+	 * @param fileName - the name of file to dump to
+	 * @param fileContents - the contents to dump
 	 */
 	public static void writeToFile(Configuration conf, String fileName, String fileContents) {
 		Path file = new Path(fileName);
 		writeToFile(conf, file, fileContents);
 	}
-	
+
 	/**
-	 * 
-	 * @param conf
-	 * @param file
-	 * @param fileContents
+	 * Dumps the provided text to a file
+	 * @param conf - the configuration to use
+	 * @param file - the file to dump to
+	 * @param fileContents - the contents to dump
 	 */
 	public static void writeToFile(Configuration conf, Path file, String fileContents) {
         try {

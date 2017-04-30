@@ -26,6 +26,9 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 import org.apache.hadoop.util.Tool;
 import org.apache.hadoop.util.ToolRunner;
 
+/**
+ * Primary execution class for this program
+ */
 public class MapReduce extends Configured implements Tool {
 
 	private static final String DEFAULT_PROCESSING_TYPE = "base";
@@ -33,10 +36,13 @@ public class MapReduce extends Configured implements Tool {
 	private static final String DEFAULT_OUTPUT_PATH = "output";
 	
 	/**
-	 * Expected arguments:
-	 * args[0] = word count processing type
-	 * args[1] = input path
-	 * args[2] = output path (to be overwritten if already exists)
+	 * Primary execution method for this class
+	 * 
+	 * @param args - array of string params provided by user... expected order:
+	 * 		args[0] = word count processing type
+	 * 		args[1] = input path
+	 * 		args[2] = output path (to be overwritten if already exists)
+	 * @throws Exception
 	 */
 	public static void main(String[] args) throws Exception {
 		int code = ToolRunner.run(new Configuration(), new MapReduce(), args);
@@ -44,7 +50,9 @@ public class MapReduce extends Configured implements Tool {
 	}
 	
 	/**
-	 * 
+	 * Primary execution method for Tool Runner class
+	 * @param args - array of string parameters provided by user
+	 * @throws Exception
 	 */
 	public int run(String[] args) throws Exception {
 		String processingType = (args.length >= 1) ? args[0] : DEFAULT_PROCESSING_TYPE;

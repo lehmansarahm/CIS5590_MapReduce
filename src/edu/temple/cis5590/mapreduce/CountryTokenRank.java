@@ -24,6 +24,11 @@ import org.apache.hadoop.fs.LocatedFileStatus;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.fs.RemoteIterator;
 
+/**
+ * Reference class used to store the ranked tokens and associated counts for a given country.  
+ * Includes logic to compare rankings between two countries and determine if those two countries 
+ * share the same rankings.
+ */
 public class CountryTokenRank {
 	
 	private int tokenCount = 0;
@@ -32,6 +37,10 @@ public class CountryTokenRank {
 	private String countryName;
 	private List<String> matchingCountries = new ArrayList<String>();
 	
+	/**
+	 * Primary constructor.  Initializes the list of ranked tokens according to a provided limit
+	 * @param limit - the number of ranked tokens to retain
+	 */
 	public CountryTokenRank(int limit) {
 		rankedTokens = new String[limit];
 		for (int i = 0; i < limit; i++) {
@@ -39,6 +48,10 @@ public class CountryTokenRank {
 		}
 	}
 	
+	/**
+	 * Parses out a token and associated word count from the provide line of text
+	 * @param line - the line of text from which to extract a token and count
+	 */
 	public void parseToken(String line) {
 		String[] countryTokenCount = line.split("-");
 		countryName = countryTokenCount[0].trim();
@@ -48,23 +61,44 @@ public class CountryTokenRank {
 		tokenCount++;
 	}
 	
+	/**
+	 * Reference method to manually add the name of a matching country
+	 * @param matchingCountryName - the name of the matching country
+	 */
 	public void addMatchingCountry(String matchingCountryName) {
 		if (!matchingCountries.contains(matchingCountryName))
 			matchingCountries.add(matchingCountryName);
 	}
 	
+	/**
+	 * Reference method to return the token at rank indicated by index
+	 * @param index - the rank index for which to return the token
+	 * @return token matching rank "index"
+	 */
 	public String getRankedToken(int index) {
 		return (rankedTokens[index]);
 	}
 	
+	/**
+	 * Returns the country name for the current object
+	 * @return the country name associated with the current object
+	 */
 	public String getCountryName() {
 		return countryName;
 	}
 	
+	/**
+	 * Returns the list of countries whose rankings match that of the current object
+	 * @return the list of rank match countries
+	 */
 	public List<String> getMatchingCountries() {
 		return matchingCountries;
 	}
 	
+	/**
+	 * Comparison method to determine if two countries have the same token rankings
+	 * @param ctr - the country to compare against
+	 */
 	public void compare(CountryTokenRank ctr) {
 		boolean match = true;
 		for (int i = 0; i < rankedTokens.length; i++) {
@@ -80,6 +114,11 @@ public class CountryTokenRank {
 		}
 	}
 	
+	/**
+	 * Dumps the rank matches for this object to a file
+	 * @param conf - the configuration to use when writing to a file
+	 * @param outputFile - the output file to write to
+	 */
 	public void writeMatchesToFile(Configuration conf, Path outputFile) {
 		String output = "\n" + countryName.toUpperCase() + " RANK MATCHES:\n\t";
 		if (matchingCountries.size() == 0) output += "NONE";
@@ -96,10 +135,11 @@ public class CountryTokenRank {
 	}
 
 	/**
-	 * 
-	 * @param conf
-	 * @param outputPath
-	 * @param rankLimit
+	 * Static reference method to compare the results across a group of countries
+	 * @param conf - the configuration to use when comparing results
+	 * @param outputPath - the folder of output files to use in the comparison
+	 * @param rankLimit - the limit of ranked tokens to use in the final comparison
+	 * @return the list of matches to print
 	 */
 	public static List<String> compareResults(Configuration conf, String outputPath, int rankLimit) {
 		List<CountryTokenRank> ctrList = new ArrayList<CountryTokenRank>();

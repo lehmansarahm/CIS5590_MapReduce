@@ -18,7 +18,7 @@ import java.util.Date;
 import org.apache.hadoop.conf.Configuration;
 
 /**
- * 
+ * Utility class to write execution feedback to file
  */
 public class Logger {
 
@@ -30,26 +30,26 @@ public class Logger {
 	private static String logFilename = (DEFAULT_LOGS_PATH + "/log.csv");
 	
 	/**
-	 * 
-	 * @param message
+	 * Writes an "info" class message to the log
+	 * @param message - the message to add to log
 	 */
 	public static void info(String message) {
 		String entry = String.format(LOG_ENTRY_FORMAT, "INFO", getCurrentTimestamp(), message);
 		logContents += entry + "\n";
 	}
-	
+
 	/**
-	 * 
-	 * @param message
+	 * Writes an "error" class message to the log
+	 * @param message - the message to add to log
 	 */
 	public static void error(String message) {
 		String entry = String.format(LOG_ENTRY_FORMAT, "ERROR", getCurrentTimestamp(), message);
 		logContents += entry + "\n";
 	}
-	
+
 	/**
-	 * 
-	 * @param message
+	 * Writes a "debug" class message to the log
+	 * @param message - the message to add to log
 	 */
 	public static void debug(String message) {
 		String entry = String.format(LOG_ENTRY_FORMAT, "DEBUG", getCurrentTimestamp(), message);
@@ -57,15 +57,16 @@ public class Logger {
 	}
 	
 	/**
-	 * 
+	 * Dumps the current set of log messages to the log file
+	 * @param conf - the configuration to use when writing the log contents
 	 */
 	public static void writeResultsToLog(Configuration conf) {
 		Utils.writeToFile(conf, logFilename, logContents);
 	}
 	
 	/**
-	 * 
-	 * @return
+	 * Returns the current date-time stamp
+	 * @return - the current date-time stamp
 	 */
 	private static String getCurrentTimestamp() {
 		Date currentDate = new Date();
